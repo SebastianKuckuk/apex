@@ -1,0 +1,204 @@
+# configuration
+
+TEST_CLASS = benchmark
+TEST_CASE  = stencil-3d
+BUILD_DIR  = ../../../build/benchmark/stencil-3d
+
+
+# default parameters
+
+PARAMETERS = double 256 256 256 2 10
+
+
+# all
+
+targets = \
+	stencil-3d-base \
+	stencil-3d-omp-host \
+	stencil-3d-omp-target-expl \
+	stencil-3d-omp-target-mm \
+	stencil-3d-openacc-expl \
+	stencil-3d-openacc-mm \
+	stencil-3d-cuda-expl \
+	stencil-3d-cuda-mm \
+	stencil-3d-sycl-buffer \
+	stencil-3d-sycl-expl \
+	stencil-3d-sycl-mm \
+	stencil-3d-std-par \
+	stencil-3d-kokkos-serial \
+	stencil-3d-kokkos-omp-host \
+	stencil-3d-kokkos-cuda
+
+.PHONY: all
+all: mk-target-dir $(targets)
+
+mk-target-dir:
+	mkdir -p $(BUILD_DIR)
+
+
+# build rules
+
+$(BUILD_DIR)/stencil-3d-base: stencil-3d-base.cpp stencil-3d-util.h ../../util.h
+	g++ -O3 -march=native -std=c++17 -o $(BUILD_DIR)/stencil-3d-base stencil-3d-base.cpp
+
+$(BUILD_DIR)/stencil-3d-omp-host: stencil-3d-omp-host.cpp stencil-3d-util.h ../../util.h
+	g++ -O3 -march=native -std=c++17 -fopenmp -o $(BUILD_DIR)/stencil-3d-omp-host stencil-3d-omp-host.cpp
+
+$(BUILD_DIR)/stencil-3d-omp-target-expl: stencil-3d-omp-target-expl.cpp stencil-3d-util.h ../../util.h
+	nvc++ -O3 -std=c++17 -mp=gpu -target=gpu -o $(BUILD_DIR)/stencil-3d-omp-target-expl stencil-3d-omp-target-expl.cpp
+
+$(BUILD_DIR)/stencil-3d-omp-target-mm: stencil-3d-omp-target-mm.cpp stencil-3d-util.h ../../util.h
+	nvc++ -O3 -std=c++17 -mp=gpu -target=gpu -gpu=managed -o $(BUILD_DIR)/stencil-3d-omp-target-mm stencil-3d-omp-target-mm.cpp
+
+$(BUILD_DIR)/stencil-3d-openacc-expl: stencil-3d-openacc-expl.cpp stencil-3d-util.h ../../util.h
+	nvc++ -O3 -std=c++17 -acc=gpu -target=gpu -o $(BUILD_DIR)/stencil-3d-openacc-expl stencil-3d-openacc-expl.cpp
+
+$(BUILD_DIR)/stencil-3d-openacc-mm: stencil-3d-openacc-mm.cpp stencil-3d-util.h ../../util.h
+	nvc++ -O3 -std=c++17 -acc=gpu -target=gpu -gpu=managed -o $(BUILD_DIR)/stencil-3d-openacc-mm stencil-3d-openacc-mm.cpp
+
+$(BUILD_DIR)/stencil-3d-cuda-expl: stencil-3d-cuda-expl.cu stencil-3d-util.h ../../util.h
+	nvc++ -O3 -fast -std=c++17 -o $(BUILD_DIR)/stencil-3d-cuda-expl stencil-3d-cuda-expl.cu
+
+$(BUILD_DIR)/stencil-3d-cuda-mm: stencil-3d-cuda-mm.cu stencil-3d-util.h ../../util.h
+	nvc++ -O3 -fast -std=c++17 -o $(BUILD_DIR)/stencil-3d-cuda-mm stencil-3d-cuda-mm.cu
+
+$(BUILD_DIR)/stencil-3d-sycl-buffer: stencil-3d-sycl-buffer.cpp stencil-3d-util.h ../../util.h
+	icpx -O3 -march=native -std=c++17 -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Xsycl-target-backend --sycl-gpu-arch=sm_80 -o $(BUILD_DIR)/stencil-3d-sycl-buffer stencil-3d-sycl-buffer.cpp
+
+$(BUILD_DIR)/stencil-3d-sycl-expl: stencil-3d-sycl-expl.cpp stencil-3d-util.h ../../util.h
+	icpx -O3 -march=native -std=c++17 -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Xsycl-target-backend --sycl-gpu-arch=sm_80 -o $(BUILD_DIR)/stencil-3d-sycl-expl stencil-3d-sycl-expl.cpp
+
+$(BUILD_DIR)/stencil-3d-sycl-mm: stencil-3d-sycl-mm.cpp stencil-3d-util.h ../../util.h
+	icpx -O3 -march=native -std=c++17 -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Xsycl-target-backend --sycl-gpu-arch=sm_80 -o $(BUILD_DIR)/stencil-3d-sycl-mm stencil-3d-sycl-mm.cpp
+
+$(BUILD_DIR)/stencil-3d-std-par: stencil-3d-std-par.cpp stencil-3d-util.h ../../util.h
+	nvc++ -O3 -std=c++17 -stdpar=gpu -target=gpu -o $(BUILD_DIR)/stencil-3d-std-par stencil-3d-std-par.cpp
+
+$(BUILD_DIR)/stencil-3d-kokkos-serial: stencil-3d-kokkos.cpp stencil-3d-util.h ../../util.h
+	g++ -O3 -march=native -std=c++17 -I/home/hpc/iwia/iwia71/kokkos/install-serial/include -L/home/hpc/iwia/iwia71/kokkos/install-serial/lib64 -o $(BUILD_DIR)/stencil-3d-kokkos-serial stencil-3d-kokkos.cpp -lkokkoscore -ldl
+
+$(BUILD_DIR)/stencil-3d-kokkos-omp-host: stencil-3d-kokkos.cpp stencil-3d-util.h ../../util.h
+	g++ -O3 -march=native -std=c++17 -fopenmp -I/home/hpc/iwia/iwia71/kokkos/install-omp/include -L/home/hpc/iwia/iwia71/kokkos/install-omp/lib64 -o $(BUILD_DIR)/stencil-3d-kokkos-omp-host stencil-3d-kokkos.cpp -lkokkoscore -ldl
+
+$(BUILD_DIR)/stencil-3d-kokkos-cuda: stencil-3d-kokkos.cpp stencil-3d-util.h ../../util.h
+	/home/hpc/iwia/iwia71/kokkos/install-cuda/bin/nvcc_wrapper -O3 -march=native -std=c++17 -arch=sm_80 --expt-extended-lambda --expt-relaxed-constexpr -I/home/hpc/iwia/iwia71/kokkos/install-cuda/include -L/home/hpc/iwia/iwia71/kokkos/install-cuda/lib64 -o $(BUILD_DIR)/stencil-3d-kokkos-cuda stencil-3d-kokkos.cpp -lkokkoscore -ldl
+
+
+# aliases without build directory
+
+.PHONY: stencil-3d-base
+stencil-3d-base: $(BUILD_DIR)/stencil-3d-base
+
+.PHONY: stencil-3d-omp-host
+stencil-3d-omp-host: $(BUILD_DIR)/stencil-3d-omp-host
+
+.PHONY: stencil-3d-omp-target-expl
+stencil-3d-omp-target-expl: $(BUILD_DIR)/stencil-3d-omp-target-expl
+
+.PHONY: stencil-3d-omp-target-mm
+stencil-3d-omp-target-mm: $(BUILD_DIR)/stencil-3d-omp-target-mm
+
+.PHONY: stencil-3d-openacc-expl
+stencil-3d-openacc-expl: $(BUILD_DIR)/stencil-3d-openacc-expl
+
+.PHONY: stencil-3d-openacc-mm
+stencil-3d-openacc-mm: $(BUILD_DIR)/stencil-3d-openacc-mm
+
+.PHONY: stencil-3d-cuda-expl
+stencil-3d-cuda-expl: $(BUILD_DIR)/stencil-3d-cuda-expl
+
+.PHONY: stencil-3d-cuda-mm
+stencil-3d-cuda-mm: $(BUILD_DIR)/stencil-3d-cuda-mm
+
+.PHONY: stencil-3d-sycl-buffer
+stencil-3d-sycl-buffer: $(BUILD_DIR)/stencil-3d-sycl-buffer
+
+.PHONY: stencil-3d-sycl-expl
+stencil-3d-sycl-expl: $(BUILD_DIR)/stencil-3d-sycl-expl
+
+.PHONY: stencil-3d-sycl-mm
+stencil-3d-sycl-mm: $(BUILD_DIR)/stencil-3d-sycl-mm
+
+.PHONY: stencil-3d-std-par
+stencil-3d-std-par: $(BUILD_DIR)/stencil-3d-std-par
+
+.PHONY: stencil-3d-kokkos-serial
+stencil-3d-kokkos-serial: $(BUILD_DIR)/stencil-3d-kokkos-serial
+
+.PHONY: stencil-3d-kokkos-omp-host
+stencil-3d-kokkos-omp-host: $(BUILD_DIR)/stencil-3d-kokkos-omp-host
+
+.PHONY: stencil-3d-kokkos-cuda
+stencil-3d-kokkos-cuda: $(BUILD_DIR)/stencil-3d-kokkos-cuda
+
+
+# automated benchmark target
+
+.PHONY: bench
+bench: all
+	@echo "Base:"
+	$(BUILD_DIR)/stencil-3d-base $(PARAMETERS)
+	@echo ""
+
+	@echo "OpenMP Host:"
+	$(BUILD_DIR)/stencil-3d-omp-host $(PARAMETERS)
+	@echo ""
+
+	@echo "OpenMP Target Explicit Memory:"
+	$(BUILD_DIR)/stencil-3d-omp-target-expl $(PARAMETERS)
+	@echo ""
+
+	@echo "OpenMP Target Managed Memory:"
+	$(BUILD_DIR)/stencil-3d-omp-target-mm $(PARAMETERS)
+	@echo ""
+
+	@echo "OpenACC Explicit Memory:"
+	$(BUILD_DIR)/stencil-3d-openacc-expl $(PARAMETERS)
+	@echo ""
+
+	@echo "OpenACC Managed Memory:"
+	$(BUILD_DIR)/stencil-3d-openacc-mm $(PARAMETERS)
+	@echo ""
+
+	@echo "CUDA Explicit Memory:"
+	$(BUILD_DIR)/stencil-3d-cuda-expl $(PARAMETERS)
+	@echo ""
+
+	@echo "CUDA Managed Memory:"
+	$(BUILD_DIR)/stencil-3d-cuda-mm $(PARAMETERS)
+	@echo ""
+
+	@echo "SYCL Buffer:"
+	$(BUILD_DIR)/stencil-3d-sycl-buffer $(PARAMETERS)
+	@echo ""
+
+	@echo "SYCL Explicit Memory:"
+	$(BUILD_DIR)/stencil-3d-sycl-expl $(PARAMETERS)
+	@echo ""
+
+	@echo "SYCL Managed Memory:"
+	$(BUILD_DIR)/stencil-3d-sycl-mm $(PARAMETERS)
+	@echo ""
+
+	@echo "std::par:"
+	$(BUILD_DIR)/stencil-3d-std-par $(PARAMETERS)
+	@echo ""
+
+	@echo "Kokkos Host Serial:"
+	$(BUILD_DIR)/stencil-3d-kokkos-serial $(PARAMETERS)
+	@echo ""
+
+	@echo "Kokkos Host OpenMP:"
+	$(BUILD_DIR)/stencil-3d-kokkos-omp-host $(PARAMETERS)
+	@echo ""
+
+	@echo "Kokkos CUDA:"
+	$(BUILD_DIR)/stencil-3d-kokkos-cuda $(PARAMETERS)
+	@echo ""
+
+
+# clean target
+
+.PHONY: clean
+clean:
+	rm $(targets)
