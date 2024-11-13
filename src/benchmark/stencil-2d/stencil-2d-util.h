@@ -3,8 +3,8 @@
 
 template <typename tpe>
 inline void initStencil2D(tpe *__restrict__ u, tpe *__restrict__ uNew, const size_t nx, const size_t ny) {
-    for (size_t i1 = 1; i1 < ny - 1; ++i1) {
-        for (size_t i0 = 1; i0 < nx - 1; ++i0) {
+    for (size_t i1 = 0; i1 < ny; ++i1) {
+        for (size_t i0 = 0; i0 < nx; ++i0) {
             if (0 == i0 || nx - 1 == i0 || 0 == i1 || ny - 1 == i1) {
                 u[i0 + i1 * nx] = (tpe)0;
                 uNew[i0 + i1 * nx] = (tpe)0;

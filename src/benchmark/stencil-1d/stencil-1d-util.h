@@ -3,7 +3,7 @@
 
 template <typename tpe>
 inline void initStencil1D(tpe *__restrict__ u, tpe *__restrict__ uNew, const size_t nx) {
-    for (size_t i0 = 1; i0 < nx - 1; ++i0) {
+    for (size_t i0 = 0; i0 < nx; ++i0) {
         if (0 == i0 || nx - 1 == i0) {
             u[i0] = (tpe)0;
             uNew[i0] = (tpe)0;
