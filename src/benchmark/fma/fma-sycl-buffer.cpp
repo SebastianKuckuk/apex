@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-inline void fma(sycl::queue &q, sycl::buffer<tpe> &b_data, const size_t nx) {
+inline void fma(sycl::queue &q, sycl::buffer<tpe> &b_data, size_t nx) {
     q.submit([&](sycl::handler &h) {
         auto data = b_data.get_access(h, sycl::write_only);
 
@@ -18,9 +18,9 @@ inline void fma(sycl::queue &q, sycl::buffer<tpe> &b_data, const size_t nx) {
                     a = tmp;
                 }
 
-                tpe acc = i0;
+                tpe acc = data[i0];
 
-                for (auto r = 0; r < 1048576; ++r)
+                for (auto r = 0; r < 65536; ++r)
                     acc = a * acc + b;
 
                 // dummy check to prevent compiler from eliminating loop
@@ -65,7 +65,7 @@ inline int realMain(int argc, char *argv[]) {
 
         auto end = std::chrono::steady_clock::now();
 
-        printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe), 2097152);
+        printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe), 131072);
     } // implicit D-H copy of destroyed buffers
 
     // check solution

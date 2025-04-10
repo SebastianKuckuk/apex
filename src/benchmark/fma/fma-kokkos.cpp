@@ -4,26 +4,27 @@
 
 
 template <typename tpe>
-inline void fma(Kokkos::View<tpe *> &data, const size_t nx) {
-    Kokkos::parallel_for(Kokkos::RangePolicy<>(0, nx),    //
-                         KOKKOS_LAMBDA(const size_t i0) { //
-                             tpe a = (tpe)0.5, b = (tpe)1;
-                             // dummy op to prevent compiler from solving loop analytically
-                             if (1 == nx) {
-                                 auto tmp = b;
-                                 b = a;
-                                 a = tmp;
-                             }
+inline void fma(Kokkos::View<tpe *> &data, size_t nx) {
+    Kokkos::parallel_for(
+        Kokkos::RangePolicy<>(0, nx),    //
+        KOKKOS_LAMBDA(const size_t i0) { //
+            tpe a = (tpe)0.5, b = (tpe)1;
+            // dummy op to prevent compiler from solving loop analytically
+            if (1 == nx) {
+                auto tmp = b;
+                b = a;
+                a = tmp;
+            }
 
-                             tpe acc = i0;
+            tpe acc = data(i0);
 
-                             for (auto r = 0; r < 1048576; ++r)
-                                 acc = a * acc + b;
+            for (auto r = 0; r < 65536; ++r)
+                acc = a * acc + b;
 
-                             // dummy check to prevent compiler from eliminating loop
-                             if ((tpe)0 == acc)
-                                 data(i0) = acc;
-                         });
+            // dummy check to prevent compiler from eliminating loop
+            if ((tpe)0 == acc)
+                data(i0) = acc;
+        });
 }
 
 
@@ -61,7 +62,7 @@ inline int realMain(int argc, char *argv[]) {
 
         auto end = std::chrono::steady_clock::now();
 
-        printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe), 2097152);
+        printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe), 131072);
 
         Kokkos::deep_copy(h_data, data);
 

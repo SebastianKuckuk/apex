@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-__global__ void squareroot(const tpe *const __restrict__ src, tpe *__restrict__ dest, const size_t nx) {
+__global__ void squareroot(const tpe *const __restrict__ src, tpe *__restrict__ dest, size_t nx) {
     const size_t i0 = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (i0 < nx) {
@@ -40,12 +40,9 @@ inline int realMain(int argc, char *argv[]) {
     checkCudaError(cudaMemcpy(d_dest, dest, sizeof(tpe) * nx, cudaMemcpyHostToDevice));
     checkCudaError(cudaMemcpy(d_src, src, sizeof(tpe) * nx, cudaMemcpyHostToDevice));
 
-    dim3 blockSize(256);
-    dim3 numBlocks(ceilingDivide(nx, blockSize.x));
-
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        squareroot<<<numBlocks, blockSize>>>(d_src, d_dest, nx);
+        squareroot<<<ceilingDivide(nx, 256), 256>>>(d_src, d_dest, nx);
         std::swap(d_src, d_dest);
     }
     checkCudaError(cudaDeviceSynchronize(), true);
@@ -54,7 +51,7 @@ inline int realMain(int argc, char *argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        squareroot<<<numBlocks, blockSize>>>(d_src, d_dest, nx);
+        squareroot<<<ceilingDivide(nx, 256), 256>>>(d_src, d_dest, nx);
         std::swap(d_src, d_dest);
     }
     checkCudaError(cudaDeviceSynchronize(), true);

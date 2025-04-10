@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-__global__ void fma(tpe *__restrict__ data, const size_t nx) {
+__global__ void fma(tpe *__restrict__ data, size_t nx) {
     const size_t i0 = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (i0 < nx) {
@@ -16,9 +16,9 @@ __global__ void fma(tpe *__restrict__ data, const size_t nx) {
             a = tmp;
         }
 
-        tpe acc = i0;
+        tpe acc = data[i0];
 
-        for (auto r = 0; r < 1048576; ++r)
+        for (auto r = 0; r < 65536; ++r)
             acc = a * acc + b;
 
         // dummy check to prevent compiler from eliminating loop
@@ -45,12 +45,9 @@ inline int realMain(int argc, char *argv[]) {
 
     checkCudaError(cudaMemcpy(d_data, data, sizeof(tpe) * nx, cudaMemcpyHostToDevice));
 
-    dim3 blockSize(256);
-    dim3 numBlocks(ceilingDivide(nx, blockSize.x));
-
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        fma<<<numBlocks, blockSize>>>(d_data, nx);
+        fma<<<ceilingDivide(nx, 256), 256>>>(d_data, nx);
     }
     checkCudaError(cudaDeviceSynchronize(), true);
 
@@ -58,13 +55,13 @@ inline int realMain(int argc, char *argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        fma<<<numBlocks, blockSize>>>(d_data, nx);
+        fma<<<ceilingDivide(nx, 256), 256>>>(d_data, nx);
     }
     checkCudaError(cudaDeviceSynchronize(), true);
 
     auto end = std::chrono::steady_clock::now();
 
-    printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe), 2097152);
+    printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe), 131072);
 
     checkCudaError(cudaMemcpy(data, d_data, sizeof(tpe) * nx, cudaMemcpyDeviceToHost));
 

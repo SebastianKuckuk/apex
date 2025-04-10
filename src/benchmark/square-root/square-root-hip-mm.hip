@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-__global__ void squareroot(const tpe *const __restrict__ src, tpe *__restrict__ dest, const size_t nx) {
+__global__ void squareroot(const tpe *const __restrict__ src, tpe *__restrict__ dest, size_t nx) {
     const size_t i0 = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (i0 < nx) {
@@ -35,12 +35,9 @@ inline int realMain(int argc, char *argv[]) {
     checkHipError(hipMemPrefetchAsync(dest, sizeof(tpe) * nx, 0));
     checkHipError(hipMemPrefetchAsync(src, sizeof(tpe) * nx, 0));
 
-    dim3 blockSize(256);
-    dim3 numBlocks(ceilingDivide(nx, blockSize.x));
-
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        squareroot<<<numBlocks, blockSize>>>(src, dest, nx);
+        squareroot<<<ceilingDivide(nx, 256), 256>>>(src, dest, nx);
         std::swap(src, dest);
     }
     checkHipError(hipDeviceSynchronize(), true);
@@ -49,7 +46,7 @@ inline int realMain(int argc, char *argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        squareroot<<<numBlocks, blockSize>>>(src, dest, nx);
+        squareroot<<<ceilingDivide(nx, 256), 256>>>(src, dest, nx);
         std::swap(src, dest);
     }
     checkHipError(hipDeviceSynchronize(), true);

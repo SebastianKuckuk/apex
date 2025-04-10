@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-inline void stencil2d(sycl::queue &q, sycl::buffer<tpe> &b_u, sycl::buffer<tpe> &b_uNew, const size_t nx, const size_t ny) {
+inline void stencil2d(sycl::queue &q, sycl::buffer<tpe> &b_u, sycl::buffer<tpe> &b_uNew, size_t nx, size_t ny) {
     q.submit([&](sycl::handler &h) {
         auto u = b_u.get_access(h, sycl::read_only);
         auto uNew = b_uNew.get_access(h, sycl::write_only);

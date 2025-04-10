@@ -1,0 +1,204 @@
+# configuration
+
+TEST_CLASS = benchmark
+TEST_CASE  = stencil-1d
+BUILD_DIR  = ../../../build/benchmark/stencil-1d
+
+
+# default parameters
+
+PARAMETERS = double 67108864 2 10
+
+
+# all
+
+targets = \
+	stencil-1d-base \
+	stencil-1d-omp-host \
+	stencil-1d-omp-target-expl \
+	stencil-1d-omp-target-mm \
+	stencil-1d-openacc-expl \
+	stencil-1d-openacc-mm \
+	stencil-1d-hip-expl \
+	stencil-1d-hip-mm \
+	stencil-1d-sycl-buffer \
+	stencil-1d-sycl-expl \
+	stencil-1d-sycl-mm \
+	stencil-1d-std-par \
+	stencil-1d-kokkos-serial \
+	stencil-1d-kokkos-omp-host \
+	stencil-1d-kokkos-cuda
+
+.PHONY: all
+all: mk-target-dir $(targets)
+
+mk-target-dir:
+	mkdir -p $(BUILD_DIR)
+
+
+# build rules
+
+$(BUILD_DIR)/stencil-1d-base: stencil-1d-base.cpp stencil-1d-util.h ../../util.h
+	g++ -O3 -march=native -std=c++17 -o $(BUILD_DIR)/stencil-1d-base stencil-1d-base.cpp
+
+$(BUILD_DIR)/stencil-1d-omp-host: stencil-1d-omp-host.cpp stencil-1d-util.h ../../util.h
+	g++ -O3 -march=native -std=c++17 -fopenmp -o $(BUILD_DIR)/stencil-1d-omp-host stencil-1d-omp-host.cpp
+
+$(BUILD_DIR)/stencil-1d-omp-target-expl: stencil-1d-omp-target-expl.cpp stencil-1d-util.h ../../util.h
+	None  -o $(BUILD_DIR)/stencil-1d-omp-target-expl stencil-1d-omp-target-expl.cpp
+
+$(BUILD_DIR)/stencil-1d-omp-target-mm: stencil-1d-omp-target-mm.cpp stencil-1d-util.h ../../util.h
+	None  -o $(BUILD_DIR)/stencil-1d-omp-target-mm stencil-1d-omp-target-mm.cpp
+
+$(BUILD_DIR)/stencil-1d-openacc-expl: stencil-1d-openacc-expl.cpp stencil-1d-util.h ../../util.h
+	None  -o $(BUILD_DIR)/stencil-1d-openacc-expl stencil-1d-openacc-expl.cpp
+
+$(BUILD_DIR)/stencil-1d-openacc-mm: stencil-1d-openacc-mm.cpp stencil-1d-util.h ../../util.h
+	None  -o $(BUILD_DIR)/stencil-1d-openacc-mm stencil-1d-openacc-mm.cpp
+
+$(BUILD_DIR)/stencil-1d-hip-expl: stencil-1d-hip-expl.hip stencil-1d-util.h ../../util.h
+	hipcc -x hip -O3 -fast -std=c++17 -munsafe-fp-atomics -o $(BUILD_DIR)/stencil-1d-hip-expl stencil-1d-hip-expl.hip
+
+$(BUILD_DIR)/stencil-1d-hip-mm: stencil-1d-hip-mm.hip stencil-1d-util.h ../../util.h
+	hipcc -x hip -O3 -fast -std=c++17 -munsafe-fp-atomics -o $(BUILD_DIR)/stencil-1d-hip-mm stencil-1d-hip-mm.hip
+
+$(BUILD_DIR)/stencil-1d-sycl-buffer: stencil-1d-sycl-buffer.cpp stencil-1d-util.h ../../util.h
+	None  -o $(BUILD_DIR)/stencil-1d-sycl-buffer stencil-1d-sycl-buffer.cpp
+
+$(BUILD_DIR)/stencil-1d-sycl-expl: stencil-1d-sycl-expl.cpp stencil-1d-util.h ../../util.h
+	None  -o $(BUILD_DIR)/stencil-1d-sycl-expl stencil-1d-sycl-expl.cpp
+
+$(BUILD_DIR)/stencil-1d-sycl-mm: stencil-1d-sycl-mm.cpp stencil-1d-util.h ../../util.h
+	None  -o $(BUILD_DIR)/stencil-1d-sycl-mm stencil-1d-sycl-mm.cpp
+
+$(BUILD_DIR)/stencil-1d-std-par: stencil-1d-std-par.cpp stencil-1d-util.h ../../util.h
+	None  -o $(BUILD_DIR)/stencil-1d-std-par stencil-1d-std-par.cpp
+
+$(BUILD_DIR)/stencil-1d-kokkos-serial: stencil-1d-kokkos.cpp stencil-1d-util.h ../../util.h
+	g++ -O3 -march=native -std=c++17 -I/home/atuin/unrz/unrz101h/kokkos/install-serial/include -L/home/atuin/unrz/unrz101h/kokkos/install-serial/lib64 -o $(BUILD_DIR)/stencil-1d-kokkos-serial stencil-1d-kokkos.cpp -lkokkoscore -ldl
+
+$(BUILD_DIR)/stencil-1d-kokkos-omp-host: stencil-1d-kokkos.cpp stencil-1d-util.h ../../util.h
+	g++ -O3 -march=native -std=c++17 -fopenmp -I/home/atuin/unrz/unrz101h/kokkos/install-omp/include -L/home/atuin/unrz/unrz101h/kokkos/install-omp/lib64 -o $(BUILD_DIR)/stencil-1d-kokkos-omp-host stencil-1d-kokkos.cpp -lkokkoscore -ldl
+
+$(BUILD_DIR)/stencil-1d-kokkos-cuda: stencil-1d-kokkos.cpp stencil-1d-util.h ../../util.h
+	None  -o $(BUILD_DIR)/stencil-1d-kokkos-cuda stencil-1d-kokkos.cpp
+
+
+# aliases without build directory
+
+.PHONY: stencil-1d-base
+stencil-1d-base: $(BUILD_DIR)/stencil-1d-base
+
+.PHONY: stencil-1d-omp-host
+stencil-1d-omp-host: $(BUILD_DIR)/stencil-1d-omp-host
+
+.PHONY: stencil-1d-omp-target-expl
+stencil-1d-omp-target-expl: $(BUILD_DIR)/stencil-1d-omp-target-expl
+
+.PHONY: stencil-1d-omp-target-mm
+stencil-1d-omp-target-mm: $(BUILD_DIR)/stencil-1d-omp-target-mm
+
+.PHONY: stencil-1d-openacc-expl
+stencil-1d-openacc-expl: $(BUILD_DIR)/stencil-1d-openacc-expl
+
+.PHONY: stencil-1d-openacc-mm
+stencil-1d-openacc-mm: $(BUILD_DIR)/stencil-1d-openacc-mm
+
+.PHONY: stencil-1d-hip-expl
+stencil-1d-hip-expl: $(BUILD_DIR)/stencil-1d-hip-expl
+
+.PHONY: stencil-1d-hip-mm
+stencil-1d-hip-mm: $(BUILD_DIR)/stencil-1d-hip-mm
+
+.PHONY: stencil-1d-sycl-buffer
+stencil-1d-sycl-buffer: $(BUILD_DIR)/stencil-1d-sycl-buffer
+
+.PHONY: stencil-1d-sycl-expl
+stencil-1d-sycl-expl: $(BUILD_DIR)/stencil-1d-sycl-expl
+
+.PHONY: stencil-1d-sycl-mm
+stencil-1d-sycl-mm: $(BUILD_DIR)/stencil-1d-sycl-mm
+
+.PHONY: stencil-1d-std-par
+stencil-1d-std-par: $(BUILD_DIR)/stencil-1d-std-par
+
+.PHONY: stencil-1d-kokkos-serial
+stencil-1d-kokkos-serial: $(BUILD_DIR)/stencil-1d-kokkos-serial
+
+.PHONY: stencil-1d-kokkos-omp-host
+stencil-1d-kokkos-omp-host: $(BUILD_DIR)/stencil-1d-kokkos-omp-host
+
+.PHONY: stencil-1d-kokkos-cuda
+stencil-1d-kokkos-cuda: $(BUILD_DIR)/stencil-1d-kokkos-cuda
+
+
+# automated benchmark target
+
+.PHONY: bench
+bench: all
+	@echo "Base:"
+	$(BUILD_DIR)/stencil-1d-base $(PARAMETERS)
+	@echo ""
+
+	@echo "OpenMP Host:"
+	$(BUILD_DIR)/stencil-1d-omp-host $(PARAMETERS)
+	@echo ""
+
+	@echo "OpenMP Target Explicit Memory:"
+	$(BUILD_DIR)/stencil-1d-omp-target-expl $(PARAMETERS)
+	@echo ""
+
+	@echo "OpenMP Target Managed Memory:"
+	$(BUILD_DIR)/stencil-1d-omp-target-mm $(PARAMETERS)
+	@echo ""
+
+	@echo "OpenACC Explicit Memory:"
+	$(BUILD_DIR)/stencil-1d-openacc-expl $(PARAMETERS)
+	@echo ""
+
+	@echo "OpenACC Managed Memory:"
+	$(BUILD_DIR)/stencil-1d-openacc-mm $(PARAMETERS)
+	@echo ""
+
+	@echo "HIP Explicit Memory:"
+	$(BUILD_DIR)/stencil-1d-hip-expl $(PARAMETERS)
+	@echo ""
+
+	@echo "HIP Managed Memory:"
+	$(BUILD_DIR)/stencil-1d-hip-mm $(PARAMETERS)
+	@echo ""
+
+	@echo "SYCL Buffer:"
+	$(BUILD_DIR)/stencil-1d-sycl-buffer $(PARAMETERS)
+	@echo ""
+
+	@echo "SYCL Explicit Memory:"
+	$(BUILD_DIR)/stencil-1d-sycl-expl $(PARAMETERS)
+	@echo ""
+
+	@echo "SYCL Managed Memory:"
+	$(BUILD_DIR)/stencil-1d-sycl-mm $(PARAMETERS)
+	@echo ""
+
+	@echo "std::par:"
+	$(BUILD_DIR)/stencil-1d-std-par $(PARAMETERS)
+	@echo ""
+
+	@echo "Kokkos Host Serial:"
+	$(BUILD_DIR)/stencil-1d-kokkos-serial $(PARAMETERS)
+	@echo ""
+
+	@echo "Kokkos Host OpenMP:"
+	$(BUILD_DIR)/stencil-1d-kokkos-omp-host $(PARAMETERS)
+	@echo ""
+
+	@echo "Kokkos CUDA:"
+	$(BUILD_DIR)/stencil-1d-kokkos-cuda $(PARAMETERS)
+	@echo ""
+
+
+# clean target
+
+.PHONY: clean
+clean:
+	rm $(targets)

@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-inline void squareroot(sycl::queue &q, const tpe *const __restrict__ src, tpe *__restrict__ dest, const size_t nx) {
+inline void squareroot(sycl::queue &q, const tpe *const __restrict__ src, tpe *__restrict__ dest, size_t nx) {
     q.submit([&](sycl::handler &h) {
         h.parallel_for(nx, [=](auto i0) {
             if (i0 < nx) {

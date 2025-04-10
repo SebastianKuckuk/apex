@@ -2,7 +2,7 @@
 
 
 template <typename tpe>
-inline void squareroot(const tpe *const __restrict__ src, tpe *__restrict__ dest, const size_t nx) {
+inline void squareroot(const tpe *const __restrict__ src, tpe *__restrict__ dest, size_t nx) {
 #pragma omp parallel for schedule(static)
     for (size_t i0 = 0; i0 < nx; ++i0) {
         tpe acc = src[i0];

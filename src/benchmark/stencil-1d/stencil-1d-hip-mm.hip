@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-__global__ void stencil1d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, const size_t nx) {
+__global__ void stencil1d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, size_t nx) {
     const size_t i0 = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (i0 >= 1 && i0 < nx - 1) {
@@ -30,12 +30,9 @@ inline int realMain(int argc, char *argv[]) {
     checkHipError(hipMemPrefetchAsync(u, sizeof(tpe) * nx, 0));
     checkHipError(hipMemPrefetchAsync(uNew, sizeof(tpe) * nx, 0));
 
-    dim3 blockSize(256);
-    dim3 numBlocks(ceilingDivide(nx, blockSize.x));
-
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        stencil1d<<<numBlocks, blockSize>>>(u, uNew, nx);
+        stencil1d<<<ceilingDivide(nx - 1, 256), 256>>>(u, uNew, nx);
         std::swap(u, uNew);
     }
     checkHipError(hipDeviceSynchronize(), true);
@@ -44,7 +41,7 @@ inline int realMain(int argc, char *argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        stencil1d<<<numBlocks, blockSize>>>(u, uNew, nx);
+        stencil1d<<<ceilingDivide(nx - 1, 256), 256>>>(u, uNew, nx);
         std::swap(u, uNew);
     }
     checkHipError(hipDeviceSynchronize(), true);

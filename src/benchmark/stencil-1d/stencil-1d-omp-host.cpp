@@ -2,7 +2,7 @@
 
 
 template <typename tpe>
-inline void stencil1d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, const size_t nx) {
+inline void stencil1d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, size_t nx) {
 #pragma omp parallel for schedule(static)
     for (size_t i0 = 1; i0 < nx - 1; ++i0) {
         uNew[i0] = 0.5 * u[i0 + 1] + 0.5 * u[i0 - 1];

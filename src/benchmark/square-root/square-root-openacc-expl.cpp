@@ -2,8 +2,8 @@
 
 
 template <typename tpe>
-inline void squareroot(const tpe *const __restrict__ src, tpe *__restrict__ dest, const size_t nx) {
-#pragma acc parallel loop present(src[0 : nx], dest[0 : nx])
+inline void squareroot(const tpe *const __restrict__ src, tpe *__restrict__ dest, size_t nx) {
+#pragma acc parallel loop present(src [0:nx], dest [0:nx])
     for (size_t i0 = 0; i0 < nx; ++i0) {
         tpe acc = src[i0];
 
@@ -29,8 +29,8 @@ inline int realMain(int argc, char *argv[]) {
     // init
     initSquareRoot(dest, src, nx);
 
-#pragma acc enter data copyin(dest[0 : nx])
-#pragma acc enter data copyin(src[0 : nx])
+#pragma acc enter data copyin(dest [0:nx])
+#pragma acc enter data copyin(src [0:nx])
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
@@ -50,8 +50,8 @@ inline int realMain(int argc, char *argv[]) {
 
     printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe) + sizeof(tpe), 65536);
 
-#pragma acc exit data copyout(dest[0 : nx])
-#pragma acc exit data copyout(src[0 : nx])
+#pragma acc exit data copyout(dest [0:nx])
+#pragma acc exit data copyout(src [0:nx])
 
     // check solution
     checkSolutionSquareRoot(dest, src, nx, nIt + nItWarmUp);

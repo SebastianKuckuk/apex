@@ -1,0 +1,204 @@
+# configuration
+
+TEST_CLASS = benchmark
+TEST_CASE  = stream
+BUILD_DIR  = ../../../build/benchmark/stream
+
+
+# default parameters
+
+PARAMETERS = double 67108864 2 10
+
+
+# all
+
+targets = \
+	stream-base \
+	stream-omp-host \
+	stream-omp-target-expl \
+	stream-omp-target-mm \
+	stream-openacc-expl \
+	stream-openacc-mm \
+	stream-cuda-expl \
+	stream-cuda-mm \
+	stream-sycl-buffer \
+	stream-sycl-expl \
+	stream-sycl-mm \
+	stream-std-par \
+	stream-kokkos-serial \
+	stream-kokkos-omp-host \
+	stream-kokkos-cuda
+
+.PHONY: all
+all: mk-target-dir $(targets)
+
+mk-target-dir:
+	mkdir -p $(BUILD_DIR)
+
+
+# build rules
+
+$(BUILD_DIR)/stream-base: stream-base.cpp stream-util.h ../../util.h
+	g++ -O3 -march=native -std=c++17 -o $(BUILD_DIR)/stream-base stream-base.cpp
+
+$(BUILD_DIR)/stream-omp-host: stream-omp-host.cpp stream-util.h ../../util.h
+	g++ -O3 -march=native -std=c++17 -fopenmp -o $(BUILD_DIR)/stream-omp-host stream-omp-host.cpp
+
+$(BUILD_DIR)/stream-omp-target-expl: stream-omp-target-expl.cpp stream-util.h ../../util.h
+	nvc++ -O3 -std=c++17 -mp=gpu -target=gpu -o $(BUILD_DIR)/stream-omp-target-expl stream-omp-target-expl.cpp
+
+$(BUILD_DIR)/stream-omp-target-mm: stream-omp-target-mm.cpp stream-util.h ../../util.h
+	nvc++ -O3 -std=c++17 -mp=gpu -target=gpu -gpu=managed -o $(BUILD_DIR)/stream-omp-target-mm stream-omp-target-mm.cpp
+
+$(BUILD_DIR)/stream-openacc-expl: stream-openacc-expl.cpp stream-util.h ../../util.h
+	nvc++ -O3 -std=c++17 -acc=gpu -target=gpu -o $(BUILD_DIR)/stream-openacc-expl stream-openacc-expl.cpp
+
+$(BUILD_DIR)/stream-openacc-mm: stream-openacc-mm.cpp stream-util.h ../../util.h
+	nvc++ -O3 -std=c++17 -acc=gpu -target=gpu -gpu=managed -o $(BUILD_DIR)/stream-openacc-mm stream-openacc-mm.cpp
+
+$(BUILD_DIR)/stream-cuda-expl: stream-cuda-expl.cu stream-util.h ../../util.h
+	nvc++ -O3 -fast -std=c++17 -o $(BUILD_DIR)/stream-cuda-expl stream-cuda-expl.cu
+
+$(BUILD_DIR)/stream-cuda-mm: stream-cuda-mm.cu stream-util.h ../../util.h
+	nvc++ -O3 -fast -std=c++17 -o $(BUILD_DIR)/stream-cuda-mm stream-cuda-mm.cu
+
+$(BUILD_DIR)/stream-sycl-buffer: stream-sycl-buffer.cpp stream-util.h ../../util.h
+	icpx -O3 -march=native -std=c++17 -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Xsycl-target-backend --cuda-gpu-arch=sm_80 -o $(BUILD_DIR)/stream-sycl-buffer stream-sycl-buffer.cpp
+
+$(BUILD_DIR)/stream-sycl-expl: stream-sycl-expl.cpp stream-util.h ../../util.h
+	icpx -O3 -march=native -std=c++17 -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Xsycl-target-backend --cuda-gpu-arch=sm_80 -o $(BUILD_DIR)/stream-sycl-expl stream-sycl-expl.cpp
+
+$(BUILD_DIR)/stream-sycl-mm: stream-sycl-mm.cpp stream-util.h ../../util.h
+	icpx -O3 -march=native -std=c++17 -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Xsycl-target-backend --cuda-gpu-arch=sm_80 -o $(BUILD_DIR)/stream-sycl-mm stream-sycl-mm.cpp
+
+$(BUILD_DIR)/stream-std-par: stream-std-par.cpp stream-util.h ../../util.h
+	nvc++ -O3 -std=c++17 -stdpar=gpu -target=gpu -o $(BUILD_DIR)/stream-std-par stream-std-par.cpp
+
+$(BUILD_DIR)/stream-kokkos-serial: stream-kokkos.cpp stream-util.h ../../util.h
+	g++ -O3 -march=native -std=c++17 -I/home/atuin/unrz/unrz101h/kokkos/install-serial/include -L/home/atuin/unrz/unrz101h/kokkos/install-serial/lib64 -o $(BUILD_DIR)/stream-kokkos-serial stream-kokkos.cpp -lkokkoscore -ldl
+
+$(BUILD_DIR)/stream-kokkos-omp-host: stream-kokkos.cpp stream-util.h ../../util.h
+	g++ -O3 -march=native -std=c++17 -fopenmp -I/home/atuin/unrz/unrz101h/kokkos/install-omp/include -L/home/atuin/unrz/unrz101h/kokkos/install-omp/lib64 -o $(BUILD_DIR)/stream-kokkos-omp-host stream-kokkos.cpp -lkokkoscore -ldl
+
+$(BUILD_DIR)/stream-kokkos-cuda: stream-kokkos.cpp stream-util.h ../../util.h
+	/home/atuin/unrz/unrz101h/kokkos/install-cuda/bin/nvcc_wrapper -O3 -march=native -std=c++17 -arch=sm_80 --expt-extended-lambda --expt-relaxed-constexpr -I/home/atuin/unrz/unrz101h/kokkos/install-cuda/include -L/home/atuin/unrz/unrz101h/kokkos/install-cuda/lib64 -o $(BUILD_DIR)/stream-kokkos-cuda stream-kokkos.cpp -lkokkoscore -ldl -lcuda
+
+
+# aliases without build directory
+
+.PHONY: stream-base
+stream-base: $(BUILD_DIR)/stream-base
+
+.PHONY: stream-omp-host
+stream-omp-host: $(BUILD_DIR)/stream-omp-host
+
+.PHONY: stream-omp-target-expl
+stream-omp-target-expl: $(BUILD_DIR)/stream-omp-target-expl
+
+.PHONY: stream-omp-target-mm
+stream-omp-target-mm: $(BUILD_DIR)/stream-omp-target-mm
+
+.PHONY: stream-openacc-expl
+stream-openacc-expl: $(BUILD_DIR)/stream-openacc-expl
+
+.PHONY: stream-openacc-mm
+stream-openacc-mm: $(BUILD_DIR)/stream-openacc-mm
+
+.PHONY: stream-cuda-expl
+stream-cuda-expl: $(BUILD_DIR)/stream-cuda-expl
+
+.PHONY: stream-cuda-mm
+stream-cuda-mm: $(BUILD_DIR)/stream-cuda-mm
+
+.PHONY: stream-sycl-buffer
+stream-sycl-buffer: $(BUILD_DIR)/stream-sycl-buffer
+
+.PHONY: stream-sycl-expl
+stream-sycl-expl: $(BUILD_DIR)/stream-sycl-expl
+
+.PHONY: stream-sycl-mm
+stream-sycl-mm: $(BUILD_DIR)/stream-sycl-mm
+
+.PHONY: stream-std-par
+stream-std-par: $(BUILD_DIR)/stream-std-par
+
+.PHONY: stream-kokkos-serial
+stream-kokkos-serial: $(BUILD_DIR)/stream-kokkos-serial
+
+.PHONY: stream-kokkos-omp-host
+stream-kokkos-omp-host: $(BUILD_DIR)/stream-kokkos-omp-host
+
+.PHONY: stream-kokkos-cuda
+stream-kokkos-cuda: $(BUILD_DIR)/stream-kokkos-cuda
+
+
+# automated benchmark target
+
+.PHONY: bench
+bench: all
+	@echo "Base:"
+	$(BUILD_DIR)/stream-base $(PARAMETERS)
+	@echo ""
+
+	@echo "OpenMP Host:"
+	$(BUILD_DIR)/stream-omp-host $(PARAMETERS)
+	@echo ""
+
+	@echo "OpenMP Target Explicit Memory:"
+	$(BUILD_DIR)/stream-omp-target-expl $(PARAMETERS)
+	@echo ""
+
+	@echo "OpenMP Target Managed Memory:"
+	$(BUILD_DIR)/stream-omp-target-mm $(PARAMETERS)
+	@echo ""
+
+	@echo "OpenACC Explicit Memory:"
+	$(BUILD_DIR)/stream-openacc-expl $(PARAMETERS)
+	@echo ""
+
+	@echo "OpenACC Managed Memory:"
+	$(BUILD_DIR)/stream-openacc-mm $(PARAMETERS)
+	@echo ""
+
+	@echo "CUDA Explicit Memory:"
+	$(BUILD_DIR)/stream-cuda-expl $(PARAMETERS)
+	@echo ""
+
+	@echo "CUDA Managed Memory:"
+	$(BUILD_DIR)/stream-cuda-mm $(PARAMETERS)
+	@echo ""
+
+	@echo "SYCL Buffer:"
+	$(BUILD_DIR)/stream-sycl-buffer $(PARAMETERS)
+	@echo ""
+
+	@echo "SYCL Explicit Memory:"
+	$(BUILD_DIR)/stream-sycl-expl $(PARAMETERS)
+	@echo ""
+
+	@echo "SYCL Managed Memory:"
+	$(BUILD_DIR)/stream-sycl-mm $(PARAMETERS)
+	@echo ""
+
+	@echo "std::par:"
+	$(BUILD_DIR)/stream-std-par $(PARAMETERS)
+	@echo ""
+
+	@echo "Kokkos Host Serial:"
+	$(BUILD_DIR)/stream-kokkos-serial $(PARAMETERS)
+	@echo ""
+
+	@echo "Kokkos Host OpenMP:"
+	$(BUILD_DIR)/stream-kokkos-omp-host $(PARAMETERS)
+	@echo ""
+
+	@echo "Kokkos CUDA:"
+	$(BUILD_DIR)/stream-kokkos-cuda $(PARAMETERS)
+	@echo ""
+
+
+# clean target
+
+.PHONY: clean
+clean:
+	rm $(targets)

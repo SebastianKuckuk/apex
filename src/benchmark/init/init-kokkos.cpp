@@ -4,11 +4,12 @@
 
 
 template <typename tpe>
-inline void init(Kokkos::View<tpe *> &data, const size_t nx) {
-    Kokkos::parallel_for(Kokkos::RangePolicy<>(0, nx),    //
-                         KOKKOS_LAMBDA(const size_t i0) { //
-                             data(i0) = i0;
-                         });
+inline void init(Kokkos::View<tpe *> &data, size_t nx) {
+    Kokkos::parallel_for(
+        Kokkos::RangePolicy<>(0, nx),    //
+        KOKKOS_LAMBDA(const size_t i0) { //
+            data(i0) = i0;
+        });
 }
 
 

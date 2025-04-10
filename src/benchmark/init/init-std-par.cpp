@@ -5,7 +5,7 @@
 
 
 template <typename tpe>
-inline void init(tpe *__restrict__ data, const size_t nx) {
+inline void init(tpe *__restrict__ data, size_t nx) {
     std::for_each(std::execution::par_unseq, data, data + nx, //
                   [=](const tpe &data_item) {                 //
                       const size_t i0 = &data_item - data;

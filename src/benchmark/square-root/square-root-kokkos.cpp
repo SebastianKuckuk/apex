@@ -4,16 +4,17 @@
 
 
 template <typename tpe>
-inline void squareroot(const Kokkos::View<tpe *> &src, Kokkos::View<tpe *> &dest, const size_t nx) {
-    Kokkos::parallel_for(Kokkos::RangePolicy<>(0, nx),    //
-                         KOKKOS_LAMBDA(const size_t i0) { //
-                             tpe acc = src(i0);
+inline void squareroot(const Kokkos::View<tpe *> &src, Kokkos::View<tpe *> &dest, size_t nx) {
+    Kokkos::parallel_for(
+        Kokkos::RangePolicy<>(0, nx),    //
+        KOKKOS_LAMBDA(const size_t i0) { //
+            tpe acc = src(i0);
 
-                             for (auto r = 0; r < 65536; ++r)
-                                 acc = sqrt(acc);
+            for (auto r = 0; r < 65536; ++r)
+                acc = sqrt(acc);
 
-                             dest(i0) = acc;
-                         });
+            dest(i0) = acc;
+        });
 }
 
 

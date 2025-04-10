@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-inline void stencil2d(sycl::queue &q, const tpe *const __restrict__ u, tpe *__restrict__ uNew, const size_t nx, const size_t ny) {
+inline void stencil2d(sycl::queue &q, const tpe *const __restrict__ u, tpe *__restrict__ uNew, size_t nx, size_t ny) {
     q.submit([&](sycl::handler &h) {
         h.parallel_for(sycl::nd_range<2>(sycl::range<2>(ceilToMultipleOf(ny - 1, 16), ceilToMultipleOf(nx - 1, 16)), sycl::range<2>(16, 16)), [=](sycl::nd_item<2> item) {
             const auto i0 = item.get_global_id(1);

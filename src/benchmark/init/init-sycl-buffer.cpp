@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-inline void init(sycl::queue &q, sycl::buffer<tpe> &b_data, const size_t nx) {
+inline void init(sycl::queue &q, sycl::buffer<tpe> &b_data, size_t nx) {
     q.submit([&](sycl::handler &h) {
         auto data = b_data.get_access(h, sycl::write_only);
 

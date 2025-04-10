@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-inline void init(sycl::queue &q, tpe *__restrict__ data, const size_t nx) {
+inline void init(sycl::queue &q, tpe *__restrict__ data, size_t nx) {
     q.submit([&](sycl::handler &h) {
         h.parallel_for(nx, [=](auto i0) {
             if (i0 < nx) {

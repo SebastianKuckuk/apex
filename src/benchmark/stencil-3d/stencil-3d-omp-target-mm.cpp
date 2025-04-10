@@ -5,7 +5,7 @@
 
 
 template <typename tpe>
-inline void stencil3d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, const size_t nx, const size_t ny, const size_t nz) {
+inline void stencil3d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, size_t nx, size_t ny, size_t nz) {
 #pragma omp target teams distribute parallel for collapse(3)
     for (size_t i2 = 1; i2 < nz - 1; ++i2) {
         for (size_t i1 = 1; i1 < ny - 1; ++i1) {

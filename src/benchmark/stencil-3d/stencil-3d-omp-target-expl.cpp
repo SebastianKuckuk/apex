@@ -2,7 +2,7 @@
 
 
 template <typename tpe>
-inline void stencil3d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, const size_t nx, const size_t ny, const size_t nz) {
+inline void stencil3d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, size_t nx, size_t ny, size_t nz) {
 #pragma omp target teams distribute parallel for collapse(3)
     for (size_t i2 = 1; i2 < nz - 1; ++i2) {
         for (size_t i1 = 1; i1 < ny - 1; ++i1) {
@@ -28,8 +28,10 @@ inline int realMain(int argc, char *argv[]) {
     // init
     initStencil3D(u, uNew, nx, ny, nz);
 
-#pragma omp target enter data map(to : u[0 : nx * ny * nz])
-#pragma omp target enter data map(to : uNew[0 : nx * ny * nz])
+#pragma omp target enter data map(to \
+                                  : u [0:nx * ny * nz])
+#pragma omp target enter data map(to \
+                                  : uNew [0:nx * ny * nz])
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
@@ -49,8 +51,10 @@ inline int realMain(int argc, char *argv[]) {
 
     printStats<tpe>(end - start, nIt, nx * ny * nz, tpeName, sizeof(tpe) + sizeof(tpe), 11);
 
-#pragma omp target exit data map(from : u[0 : nx * ny * nz])
-#pragma omp target exit data map(from : uNew[0 : nx * ny * nz])
+#pragma omp target exit data map(from \
+                                 : u [0:nx * ny * nz])
+#pragma omp target exit data map(from \
+                                 : uNew [0:nx * ny * nz])
 
     // check solution
     checkSolutionStencil3D(u, uNew, nx, ny, nz, nIt + nItWarmUp);

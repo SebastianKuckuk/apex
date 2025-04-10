@@ -5,7 +5,7 @@
 
 
 template <typename tpe>
-inline void fma(tpe *__restrict__ data, const size_t nx) {
+inline void fma(tpe *__restrict__ data, size_t nx) {
     std::for_each(std::execution::par_unseq, data, data + nx, //
                   [=](const tpe &data_item) {                 //
                       const size_t i0 = &data_item - data;
@@ -18,9 +18,9 @@ inline void fma(tpe *__restrict__ data, const size_t nx) {
                               a = tmp;
                           }
 
-                          tpe acc = i0;
+                          tpe acc = data[i0];
 
-                          for (auto r = 0; r < 1048576; ++r)
+                          for (auto r = 0; r < 65536; ++r)
                               acc = a * acc + b;
 
                           // dummy check to prevent compiler from eliminating loop
@@ -56,7 +56,7 @@ inline int realMain(int argc, char *argv[]) {
 
     auto end = std::chrono::steady_clock::now();
 
-    printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe), 2097152);
+    printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe), 131072);
 
     // check solution
     checkSolutionFma(data, nx, nIt + nItWarmUp);

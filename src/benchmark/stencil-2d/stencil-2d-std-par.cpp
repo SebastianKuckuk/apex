@@ -5,7 +5,7 @@
 
 
 template <typename tpe>
-inline void stencil2d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, const size_t nx, const size_t ny) {
+inline void stencil2d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, size_t nx, size_t ny) {
     std::for_each(std::execution::par_unseq, u, u + nx * ny, //
                   [=](const tpe &u_item) {                   //
                       const size_t idx = &u_item - u;

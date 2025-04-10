@@ -5,7 +5,7 @@
 
 
 template <typename tpe>
-inline void squareroot(const tpe *const __restrict__ src, tpe *__restrict__ dest, const size_t nx) {
+inline void squareroot(const tpe *const __restrict__ src, tpe *__restrict__ dest, size_t nx) {
     std::for_each(std::execution::par_unseq, src, src + nx, //
                   [=](const tpe &src_item) {                //
                       const size_t i0 = &src_item - src;

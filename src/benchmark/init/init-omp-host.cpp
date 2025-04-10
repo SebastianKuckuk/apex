@@ -2,7 +2,7 @@
 
 
 template <typename tpe>
-inline void init(tpe *__restrict__ data, const size_t nx) {
+inline void init(tpe *__restrict__ data, size_t nx) {
 #pragma omp parallel for schedule(static)
     for (size_t i0 = 0; i0 < nx; ++i0) {
         data[i0] = i0;

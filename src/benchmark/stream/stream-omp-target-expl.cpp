@@ -2,7 +2,7 @@
 
 
 template <typename tpe>
-inline void stream(const tpe *const __restrict__ src, tpe *__restrict__ dest, const size_t nx) {
+inline void stream(const tpe *const __restrict__ src, tpe *__restrict__ dest, size_t nx) {
 #pragma omp target teams distribute parallel for
     for (size_t i0 = 0; i0 < nx; ++i0) {
         dest[i0] = src[i0] + 1;
@@ -24,8 +24,10 @@ inline int realMain(int argc, char *argv[]) {
     // init
     initStream(dest, src, nx);
 
-#pragma omp target enter data map(to : dest[0 : nx])
-#pragma omp target enter data map(to : src[0 : nx])
+#pragma omp target enter data map(to \
+                                  : dest [0:nx])
+#pragma omp target enter data map(to \
+                                  : src [0:nx])
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
@@ -45,8 +47,10 @@ inline int realMain(int argc, char *argv[]) {
 
     printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe) + sizeof(tpe), 1);
 
-#pragma omp target exit data map(from : dest[0 : nx])
-#pragma omp target exit data map(from : src[0 : nx])
+#pragma omp target exit data map(from \
+                                 : dest [0:nx])
+#pragma omp target exit data map(from \
+                                 : src [0:nx])
 
     // check solution
     checkSolutionStream(dest, src, nx, nIt + nItWarmUp);

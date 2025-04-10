@@ -2,8 +2,8 @@
 
 
 template <typename tpe>
-inline void stencil2d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, const size_t nx, const size_t ny) {
-#pragma acc parallel loop present(u[0 : nx * ny], uNew[0 : nx * ny]) collapse(2)
+inline void stencil2d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, size_t nx, size_t ny) {
+#pragma acc parallel loop present(u [0:nx * ny], uNew [0:nx * ny]) collapse(2)
     for (size_t i1 = 1; i1 < ny - 1; ++i1) {
         for (size_t i0 = 1; i0 < nx - 1; ++i0) {
             uNew[i0 + i1 * nx] = 0.25 * u[i0 + i1 * nx + 1] + 0.25 * u[i0 + i1 * nx - 1] + 0.25 * u[i0 + nx * (i1 + 1)] + 0.25 * u[i0 + nx * (i1 - 1)];

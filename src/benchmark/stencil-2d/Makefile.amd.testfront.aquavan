@@ -19,8 +19,8 @@ targets = \
 	stencil-2d-omp-target-mm \
 	stencil-2d-openacc-expl \
 	stencil-2d-openacc-mm \
-	stencil-2d-cuda-expl \
-	stencil-2d-cuda-mm \
+	stencil-2d-hip-expl \
+	stencil-2d-hip-mm \
 	stencil-2d-sycl-buffer \
 	stencil-2d-sycl-expl \
 	stencil-2d-sycl-mm \
@@ -45,43 +45,43 @@ $(BUILD_DIR)/stencil-2d-omp-host: stencil-2d-omp-host.cpp stencil-2d-util.h ../.
 	g++ -O3 -march=native -std=c++17 -fopenmp -o $(BUILD_DIR)/stencil-2d-omp-host stencil-2d-omp-host.cpp
 
 $(BUILD_DIR)/stencil-2d-omp-target-expl: stencil-2d-omp-target-expl.cpp stencil-2d-util.h ../../util.h
-	nvc++ -O3 -std=c++17 -mp=gpu -target=gpu -o $(BUILD_DIR)/stencil-2d-omp-target-expl stencil-2d-omp-target-expl.cpp
+	None  -o $(BUILD_DIR)/stencil-2d-omp-target-expl stencil-2d-omp-target-expl.cpp
 
 $(BUILD_DIR)/stencil-2d-omp-target-mm: stencil-2d-omp-target-mm.cpp stencil-2d-util.h ../../util.h
-	nvc++ -O3 -std=c++17 -mp=gpu -target=gpu -gpu=managed -o $(BUILD_DIR)/stencil-2d-omp-target-mm stencil-2d-omp-target-mm.cpp
+	None  -o $(BUILD_DIR)/stencil-2d-omp-target-mm stencil-2d-omp-target-mm.cpp
 
 $(BUILD_DIR)/stencil-2d-openacc-expl: stencil-2d-openacc-expl.cpp stencil-2d-util.h ../../util.h
-	nvc++ -O3 -std=c++17 -acc=gpu -target=gpu -o $(BUILD_DIR)/stencil-2d-openacc-expl stencil-2d-openacc-expl.cpp
+	None  -o $(BUILD_DIR)/stencil-2d-openacc-expl stencil-2d-openacc-expl.cpp
 
 $(BUILD_DIR)/stencil-2d-openacc-mm: stencil-2d-openacc-mm.cpp stencil-2d-util.h ../../util.h
-	nvc++ -O3 -std=c++17 -acc=gpu -target=gpu -gpu=managed -o $(BUILD_DIR)/stencil-2d-openacc-mm stencil-2d-openacc-mm.cpp
+	None  -o $(BUILD_DIR)/stencil-2d-openacc-mm stencil-2d-openacc-mm.cpp
 
-$(BUILD_DIR)/stencil-2d-cuda-expl: stencil-2d-cuda-expl.cu stencil-2d-util.h ../../util.h
-	nvc++ -O3 -fast -std=c++17 -o $(BUILD_DIR)/stencil-2d-cuda-expl stencil-2d-cuda-expl.cu
+$(BUILD_DIR)/stencil-2d-hip-expl: stencil-2d-hip-expl.hip stencil-2d-util.h ../../util.h
+	hipcc -x hip -O3 -fast -std=c++17 -munsafe-fp-atomics -o $(BUILD_DIR)/stencil-2d-hip-expl stencil-2d-hip-expl.hip
 
-$(BUILD_DIR)/stencil-2d-cuda-mm: stencil-2d-cuda-mm.cu stencil-2d-util.h ../../util.h
-	nvc++ -O3 -fast -std=c++17 -o $(BUILD_DIR)/stencil-2d-cuda-mm stencil-2d-cuda-mm.cu
+$(BUILD_DIR)/stencil-2d-hip-mm: stencil-2d-hip-mm.hip stencil-2d-util.h ../../util.h
+	hipcc -x hip -O3 -fast -std=c++17 -munsafe-fp-atomics -o $(BUILD_DIR)/stencil-2d-hip-mm stencil-2d-hip-mm.hip
 
 $(BUILD_DIR)/stencil-2d-sycl-buffer: stencil-2d-sycl-buffer.cpp stencil-2d-util.h ../../util.h
-	icpx -O3 -march=native -std=c++17 -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Xsycl-target-backend --sycl-gpu-arch=sm_80 -o $(BUILD_DIR)/stencil-2d-sycl-buffer stencil-2d-sycl-buffer.cpp
+	None  -o $(BUILD_DIR)/stencil-2d-sycl-buffer stencil-2d-sycl-buffer.cpp
 
 $(BUILD_DIR)/stencil-2d-sycl-expl: stencil-2d-sycl-expl.cpp stencil-2d-util.h ../../util.h
-	icpx -O3 -march=native -std=c++17 -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Xsycl-target-backend --sycl-gpu-arch=sm_80 -o $(BUILD_DIR)/stencil-2d-sycl-expl stencil-2d-sycl-expl.cpp
+	None  -o $(BUILD_DIR)/stencil-2d-sycl-expl stencil-2d-sycl-expl.cpp
 
 $(BUILD_DIR)/stencil-2d-sycl-mm: stencil-2d-sycl-mm.cpp stencil-2d-util.h ../../util.h
-	icpx -O3 -march=native -std=c++17 -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Xsycl-target-backend --sycl-gpu-arch=sm_80 -o $(BUILD_DIR)/stencil-2d-sycl-mm stencil-2d-sycl-mm.cpp
+	None  -o $(BUILD_DIR)/stencil-2d-sycl-mm stencil-2d-sycl-mm.cpp
 
 $(BUILD_DIR)/stencil-2d-std-par: stencil-2d-std-par.cpp stencil-2d-util.h ../../util.h
-	nvc++ -O3 -std=c++17 -stdpar=gpu -target=gpu -o $(BUILD_DIR)/stencil-2d-std-par stencil-2d-std-par.cpp
+	None  -o $(BUILD_DIR)/stencil-2d-std-par stencil-2d-std-par.cpp
 
 $(BUILD_DIR)/stencil-2d-kokkos-serial: stencil-2d-kokkos.cpp stencil-2d-util.h ../../util.h
-	g++ -O3 -march=native -std=c++17 -I/home/hpc/iwia/iwia71/kokkos/install-serial/include -L/home/hpc/iwia/iwia71/kokkos/install-serial/lib64 -o $(BUILD_DIR)/stencil-2d-kokkos-serial stencil-2d-kokkos.cpp -lkokkoscore -ldl
+	g++ -O3 -march=native -std=c++17 -I/home/atuin/unrz/unrz101h/kokkos/install-serial/include -L/home/atuin/unrz/unrz101h/kokkos/install-serial/lib64 -o $(BUILD_DIR)/stencil-2d-kokkos-serial stencil-2d-kokkos.cpp -lkokkoscore -ldl
 
 $(BUILD_DIR)/stencil-2d-kokkos-omp-host: stencil-2d-kokkos.cpp stencil-2d-util.h ../../util.h
-	g++ -O3 -march=native -std=c++17 -fopenmp -I/home/hpc/iwia/iwia71/kokkos/install-omp/include -L/home/hpc/iwia/iwia71/kokkos/install-omp/lib64 -o $(BUILD_DIR)/stencil-2d-kokkos-omp-host stencil-2d-kokkos.cpp -lkokkoscore -ldl
+	g++ -O3 -march=native -std=c++17 -fopenmp -I/home/atuin/unrz/unrz101h/kokkos/install-omp/include -L/home/atuin/unrz/unrz101h/kokkos/install-omp/lib64 -o $(BUILD_DIR)/stencil-2d-kokkos-omp-host stencil-2d-kokkos.cpp -lkokkoscore -ldl
 
 $(BUILD_DIR)/stencil-2d-kokkos-cuda: stencil-2d-kokkos.cpp stencil-2d-util.h ../../util.h
-	/home/hpc/iwia/iwia71/kokkos/install-cuda/bin/nvcc_wrapper -O3 -march=native -std=c++17 -arch=sm_80 --expt-extended-lambda --expt-relaxed-constexpr -I/home/hpc/iwia/iwia71/kokkos/install-cuda/include -L/home/hpc/iwia/iwia71/kokkos/install-cuda/lib64 -o $(BUILD_DIR)/stencil-2d-kokkos-cuda stencil-2d-kokkos.cpp -lkokkoscore -ldl
+	None  -o $(BUILD_DIR)/stencil-2d-kokkos-cuda stencil-2d-kokkos.cpp
 
 
 # aliases without build directory
@@ -104,11 +104,11 @@ stencil-2d-openacc-expl: $(BUILD_DIR)/stencil-2d-openacc-expl
 .PHONY: stencil-2d-openacc-mm
 stencil-2d-openacc-mm: $(BUILD_DIR)/stencil-2d-openacc-mm
 
-.PHONY: stencil-2d-cuda-expl
-stencil-2d-cuda-expl: $(BUILD_DIR)/stencil-2d-cuda-expl
+.PHONY: stencil-2d-hip-expl
+stencil-2d-hip-expl: $(BUILD_DIR)/stencil-2d-hip-expl
 
-.PHONY: stencil-2d-cuda-mm
-stencil-2d-cuda-mm: $(BUILD_DIR)/stencil-2d-cuda-mm
+.PHONY: stencil-2d-hip-mm
+stencil-2d-hip-mm: $(BUILD_DIR)/stencil-2d-hip-mm
 
 .PHONY: stencil-2d-sycl-buffer
 stencil-2d-sycl-buffer: $(BUILD_DIR)/stencil-2d-sycl-buffer
@@ -160,12 +160,12 @@ bench: all
 	$(BUILD_DIR)/stencil-2d-openacc-mm $(PARAMETERS)
 	@echo ""
 
-	@echo "CUDA Explicit Memory:"
-	$(BUILD_DIR)/stencil-2d-cuda-expl $(PARAMETERS)
+	@echo "HIP Explicit Memory:"
+	$(BUILD_DIR)/stencil-2d-hip-expl $(PARAMETERS)
 	@echo ""
 
-	@echo "CUDA Managed Memory:"
-	$(BUILD_DIR)/stencil-2d-cuda-mm $(PARAMETERS)
+	@echo "HIP Managed Memory:"
+	$(BUILD_DIR)/stencil-2d-hip-mm $(PARAMETERS)
 	@echo ""
 
 	@echo "SYCL Buffer:"

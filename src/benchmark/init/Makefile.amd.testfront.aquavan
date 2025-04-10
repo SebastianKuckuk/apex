@@ -1,0 +1,204 @@
+# configuration
+
+TEST_CLASS = benchmark
+TEST_CASE  = init
+BUILD_DIR  = ../../../build/benchmark/init
+
+
+# default parameters
+
+PARAMETERS = double 67108864 2 10
+
+
+# all
+
+targets = \
+	init-base \
+	init-omp-host \
+	init-omp-target-expl \
+	init-omp-target-mm \
+	init-openacc-expl \
+	init-openacc-mm \
+	init-hip-expl \
+	init-hip-mm \
+	init-sycl-buffer \
+	init-sycl-expl \
+	init-sycl-mm \
+	init-std-par \
+	init-kokkos-serial \
+	init-kokkos-omp-host \
+	init-kokkos-cuda
+
+.PHONY: all
+all: mk-target-dir $(targets)
+
+mk-target-dir:
+	mkdir -p $(BUILD_DIR)
+
+
+# build rules
+
+$(BUILD_DIR)/init-base: init-base.cpp init-util.h ../../util.h
+	g++ -O3 -march=native -std=c++17 -o $(BUILD_DIR)/init-base init-base.cpp
+
+$(BUILD_DIR)/init-omp-host: init-omp-host.cpp init-util.h ../../util.h
+	g++ -O3 -march=native -std=c++17 -fopenmp -o $(BUILD_DIR)/init-omp-host init-omp-host.cpp
+
+$(BUILD_DIR)/init-omp-target-expl: init-omp-target-expl.cpp init-util.h ../../util.h
+	None  -o $(BUILD_DIR)/init-omp-target-expl init-omp-target-expl.cpp
+
+$(BUILD_DIR)/init-omp-target-mm: init-omp-target-mm.cpp init-util.h ../../util.h
+	None  -o $(BUILD_DIR)/init-omp-target-mm init-omp-target-mm.cpp
+
+$(BUILD_DIR)/init-openacc-expl: init-openacc-expl.cpp init-util.h ../../util.h
+	None  -o $(BUILD_DIR)/init-openacc-expl init-openacc-expl.cpp
+
+$(BUILD_DIR)/init-openacc-mm: init-openacc-mm.cpp init-util.h ../../util.h
+	None  -o $(BUILD_DIR)/init-openacc-mm init-openacc-mm.cpp
+
+$(BUILD_DIR)/init-hip-expl: init-hip-expl.hip init-util.h ../../util.h
+	hipcc -x hip -O3 -fast -std=c++17 -munsafe-fp-atomics -o $(BUILD_DIR)/init-hip-expl init-hip-expl.hip
+
+$(BUILD_DIR)/init-hip-mm: init-hip-mm.hip init-util.h ../../util.h
+	hipcc -x hip -O3 -fast -std=c++17 -munsafe-fp-atomics -o $(BUILD_DIR)/init-hip-mm init-hip-mm.hip
+
+$(BUILD_DIR)/init-sycl-buffer: init-sycl-buffer.cpp init-util.h ../../util.h
+	None  -o $(BUILD_DIR)/init-sycl-buffer init-sycl-buffer.cpp
+
+$(BUILD_DIR)/init-sycl-expl: init-sycl-expl.cpp init-util.h ../../util.h
+	None  -o $(BUILD_DIR)/init-sycl-expl init-sycl-expl.cpp
+
+$(BUILD_DIR)/init-sycl-mm: init-sycl-mm.cpp init-util.h ../../util.h
+	None  -o $(BUILD_DIR)/init-sycl-mm init-sycl-mm.cpp
+
+$(BUILD_DIR)/init-std-par: init-std-par.cpp init-util.h ../../util.h
+	None  -o $(BUILD_DIR)/init-std-par init-std-par.cpp
+
+$(BUILD_DIR)/init-kokkos-serial: init-kokkos.cpp init-util.h ../../util.h
+	g++ -O3 -march=native -std=c++17 -I/home/atuin/unrz/unrz101h/kokkos/install-serial/include -L/home/atuin/unrz/unrz101h/kokkos/install-serial/lib64 -o $(BUILD_DIR)/init-kokkos-serial init-kokkos.cpp -lkokkoscore -ldl
+
+$(BUILD_DIR)/init-kokkos-omp-host: init-kokkos.cpp init-util.h ../../util.h
+	g++ -O3 -march=native -std=c++17 -fopenmp -I/home/atuin/unrz/unrz101h/kokkos/install-omp/include -L/home/atuin/unrz/unrz101h/kokkos/install-omp/lib64 -o $(BUILD_DIR)/init-kokkos-omp-host init-kokkos.cpp -lkokkoscore -ldl
+
+$(BUILD_DIR)/init-kokkos-cuda: init-kokkos.cpp init-util.h ../../util.h
+	None  -o $(BUILD_DIR)/init-kokkos-cuda init-kokkos.cpp
+
+
+# aliases without build directory
+
+.PHONY: init-base
+init-base: $(BUILD_DIR)/init-base
+
+.PHONY: init-omp-host
+init-omp-host: $(BUILD_DIR)/init-omp-host
+
+.PHONY: init-omp-target-expl
+init-omp-target-expl: $(BUILD_DIR)/init-omp-target-expl
+
+.PHONY: init-omp-target-mm
+init-omp-target-mm: $(BUILD_DIR)/init-omp-target-mm
+
+.PHONY: init-openacc-expl
+init-openacc-expl: $(BUILD_DIR)/init-openacc-expl
+
+.PHONY: init-openacc-mm
+init-openacc-mm: $(BUILD_DIR)/init-openacc-mm
+
+.PHONY: init-hip-expl
+init-hip-expl: $(BUILD_DIR)/init-hip-expl
+
+.PHONY: init-hip-mm
+init-hip-mm: $(BUILD_DIR)/init-hip-mm
+
+.PHONY: init-sycl-buffer
+init-sycl-buffer: $(BUILD_DIR)/init-sycl-buffer
+
+.PHONY: init-sycl-expl
+init-sycl-expl: $(BUILD_DIR)/init-sycl-expl
+
+.PHONY: init-sycl-mm
+init-sycl-mm: $(BUILD_DIR)/init-sycl-mm
+
+.PHONY: init-std-par
+init-std-par: $(BUILD_DIR)/init-std-par
+
+.PHONY: init-kokkos-serial
+init-kokkos-serial: $(BUILD_DIR)/init-kokkos-serial
+
+.PHONY: init-kokkos-omp-host
+init-kokkos-omp-host: $(BUILD_DIR)/init-kokkos-omp-host
+
+.PHONY: init-kokkos-cuda
+init-kokkos-cuda: $(BUILD_DIR)/init-kokkos-cuda
+
+
+# automated benchmark target
+
+.PHONY: bench
+bench: all
+	@echo "Base:"
+	$(BUILD_DIR)/init-base $(PARAMETERS)
+	@echo ""
+
+	@echo "OpenMP Host:"
+	$(BUILD_DIR)/init-omp-host $(PARAMETERS)
+	@echo ""
+
+	@echo "OpenMP Target Explicit Memory:"
+	$(BUILD_DIR)/init-omp-target-expl $(PARAMETERS)
+	@echo ""
+
+	@echo "OpenMP Target Managed Memory:"
+	$(BUILD_DIR)/init-omp-target-mm $(PARAMETERS)
+	@echo ""
+
+	@echo "OpenACC Explicit Memory:"
+	$(BUILD_DIR)/init-openacc-expl $(PARAMETERS)
+	@echo ""
+
+	@echo "OpenACC Managed Memory:"
+	$(BUILD_DIR)/init-openacc-mm $(PARAMETERS)
+	@echo ""
+
+	@echo "HIP Explicit Memory:"
+	$(BUILD_DIR)/init-hip-expl $(PARAMETERS)
+	@echo ""
+
+	@echo "HIP Managed Memory:"
+	$(BUILD_DIR)/init-hip-mm $(PARAMETERS)
+	@echo ""
+
+	@echo "SYCL Buffer:"
+	$(BUILD_DIR)/init-sycl-buffer $(PARAMETERS)
+	@echo ""
+
+	@echo "SYCL Explicit Memory:"
+	$(BUILD_DIR)/init-sycl-expl $(PARAMETERS)
+	@echo ""
+
+	@echo "SYCL Managed Memory:"
+	$(BUILD_DIR)/init-sycl-mm $(PARAMETERS)
+	@echo ""
+
+	@echo "std::par:"
+	$(BUILD_DIR)/init-std-par $(PARAMETERS)
+	@echo ""
+
+	@echo "Kokkos Host Serial:"
+	$(BUILD_DIR)/init-kokkos-serial $(PARAMETERS)
+	@echo ""
+
+	@echo "Kokkos Host OpenMP:"
+	$(BUILD_DIR)/init-kokkos-omp-host $(PARAMETERS)
+	@echo ""
+
+	@echo "Kokkos CUDA:"
+	$(BUILD_DIR)/init-kokkos-cuda $(PARAMETERS)
+	@echo ""
+
+
+# clean target
+
+.PHONY: clean
+clean:
+	rm $(targets)

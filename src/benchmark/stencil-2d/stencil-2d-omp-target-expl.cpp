@@ -2,7 +2,7 @@
 
 
 template <typename tpe>
-inline void stencil2d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, const size_t nx, const size_t ny) {
+inline void stencil2d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, size_t nx, size_t ny) {
 #pragma omp target teams distribute parallel for collapse(2)
     for (size_t i1 = 1; i1 < ny - 1; ++i1) {
         for (size_t i0 = 1; i0 < nx - 1; ++i0) {
@@ -26,8 +26,10 @@ inline int realMain(int argc, char *argv[]) {
     // init
     initStencil2D(u, uNew, nx, ny);
 
-#pragma omp target enter data map(to : u[0 : nx * ny])
-#pragma omp target enter data map(to : uNew[0 : nx * ny])
+#pragma omp target enter data map(to \
+                                  : u [0:nx * ny])
+#pragma omp target enter data map(to \
+                                  : uNew [0:nx * ny])
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
@@ -47,8 +49,10 @@ inline int realMain(int argc, char *argv[]) {
 
     printStats<tpe>(end - start, nIt, nx * ny, tpeName, sizeof(tpe) + sizeof(tpe), 7);
 
-#pragma omp target exit data map(from : u[0 : nx * ny])
-#pragma omp target exit data map(from : uNew[0 : nx * ny])
+#pragma omp target exit data map(from \
+                                 : u [0:nx * ny])
+#pragma omp target exit data map(from \
+                                 : uNew [0:nx * ny])
 
     // check solution
     checkSolutionStencil2D(u, uNew, nx, ny, nIt + nItWarmUp);

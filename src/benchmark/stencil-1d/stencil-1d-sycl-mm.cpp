@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-inline void stencil1d(sycl::queue &q, const tpe *const __restrict__ u, tpe *__restrict__ uNew, const size_t nx) {
+inline void stencil1d(sycl::queue &q, const tpe *const __restrict__ u, tpe *__restrict__ uNew, size_t nx) {
     q.submit([&](sycl::handler &h) {
         h.parallel_for(nx - 1, [=](auto i0) {
             if (i0 >= 1 && i0 < nx - 1) {

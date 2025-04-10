@@ -2,7 +2,7 @@
 
 
 template <typename tpe>
-inline void fma(tpe *__restrict__ data, const size_t nx) {
+inline void fma(tpe *__restrict__ data, size_t nx) {
     for (size_t i0 = 0; i0 < nx; ++i0) {
         tpe a = (tpe)0.5, b = (tpe)1;
         // dummy op to prevent compiler from solving loop analytically
@@ -12,9 +12,9 @@ inline void fma(tpe *__restrict__ data, const size_t nx) {
             a = tmp;
         }
 
-        tpe acc = i0;
+        tpe acc = data[i0];
 
-        for (auto r = 0; r < 1048576; ++r)
+        for (auto r = 0; r < 65536; ++r)
             acc = a * acc + b;
 
         // dummy check to prevent compiler from eliminating loop
@@ -50,7 +50,7 @@ inline int realMain(int argc, char *argv[]) {
 
     auto end = std::chrono::steady_clock::now();
 
-    printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe), 2097152);
+    printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe), 131072);
 
     // check solution
     checkSolutionFma(data, nx, nIt + nItWarmUp);

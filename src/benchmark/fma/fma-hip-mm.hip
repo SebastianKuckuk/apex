@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-__global__ void fma(tpe *__restrict__ data, const size_t nx) {
+__global__ void fma(tpe *__restrict__ data, size_t nx) {
     const size_t i0 = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (i0 < nx) {
@@ -16,9 +16,9 @@ __global__ void fma(tpe *__restrict__ data, const size_t nx) {
             a = tmp;
         }
 
-        tpe acc = i0;
+        tpe acc = data[i0];
 
-        for (auto r = 0; r < 1048576; ++r)
+        for (auto r = 0; r < 65536; ++r)
             acc = a * acc + b;
 
         // dummy check to prevent compiler from eliminating loop
@@ -42,12 +42,9 @@ inline int realMain(int argc, char *argv[]) {
 
     checkHipError(hipMemPrefetchAsync(data, sizeof(tpe) * nx, 0));
 
-    dim3 blockSize(256);
-    dim3 numBlocks(ceilingDivide(nx, blockSize.x));
-
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        fma<<<numBlocks, blockSize>>>(data, nx);
+        fma<<<ceilingDivide(nx, 256), 256>>>(data, nx);
     }
     checkHipError(hipDeviceSynchronize(), true);
 
@@ -55,13 +52,13 @@ inline int realMain(int argc, char *argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        fma<<<numBlocks, blockSize>>>(data, nx);
+        fma<<<ceilingDivide(nx, 256), 256>>>(data, nx);
     }
     checkHipError(hipDeviceSynchronize(), true);
 
     auto end = std::chrono::steady_clock::now();
 
-    printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe), 2097152);
+    printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe), 131072);
 
     checkHipError(hipMemPrefetchAsync(data, sizeof(tpe) * nx, hipCpuDeviceId));
 

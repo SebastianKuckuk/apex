@@ -5,7 +5,7 @@
 
 
 template <typename tpe>
-inline void stencil2d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, const size_t nx, const size_t ny) {
+inline void stencil2d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, size_t nx, size_t ny) {
 #pragma omp target teams distribute parallel for collapse(2)
     for (size_t i1 = 1; i1 < ny - 1; ++i1) {
         for (size_t i0 = 1; i0 < nx - 1; ++i0) {

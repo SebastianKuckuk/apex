@@ -2,7 +2,7 @@
 
 
 template <typename tpe>
-inline void initStencil3D(tpe *__restrict__ u, tpe *__restrict__ uNew, const size_t nx, const size_t ny, const size_t nz) {
+inline void initStencil3D(tpe *__restrict__ u, tpe *__restrict__ uNew, size_t nx, size_t ny, size_t nz) {
     for (size_t i2 = 0; i2 < nz; ++i2) {
         for (size_t i1 = 0; i1 < ny; ++i1) {
             for (size_t i0 = 0; i0 < nx; ++i0) {
@@ -19,7 +19,7 @@ inline void initStencil3D(tpe *__restrict__ u, tpe *__restrict__ uNew, const siz
 }
 
 template <typename tpe>
-inline void checkSolutionStencil3D(const tpe *const __restrict__ u, const tpe *const __restrict__ uNew, const size_t nx, const size_t ny, const size_t nz, const size_t nIt) {
+inline void checkSolutionStencil3D(const tpe *const __restrict__ u, const tpe *const __restrict__ uNew, size_t nx, size_t ny, size_t nz, size_t nIt) {
     tpe res = 0;
     for (size_t i2 = 1; i2 < nz - 1; ++i2) {
         for (size_t i1 = 1; i1 < ny - 1; ++i1) {
@@ -33,4 +33,36 @@ inline void checkSolutionStencil3D(const tpe *const __restrict__ u, const tpe *c
     res = sqrt(res);
 
     std::cout << "  Final residual is " << res << std::endl;
+}
+
+inline void parseCLA_3d(int argc, char **argv, char *&tpeName, size_t &nx, size_t &ny, size_t &nz, size_t &nItWarmUp, size_t &nIt) {
+    // default values
+    nx = 256;
+    ny = 256;
+    nz = 256;
+
+    nItWarmUp = 2;
+    nIt = 10;
+
+    // override with command line arguments
+    int i = 1;
+    if (argc > i)
+        tpeName = argv[i];
+    ++i;
+    if (argc > i)
+        nx = atoi(argv[i]);
+    ++i;
+    if (argc > i)
+        ny = atoi(argv[i]);
+    ++i;
+    if (argc > i)
+        nz = atoi(argv[i]);
+    ++i;
+
+    if (argc > i)
+        nItWarmUp = atoi(argv[i]);
+    ++i;
+    if (argc > i)
+        nIt = atoi(argv[i]);
+    ++i;
 }

@@ -63,25 +63,25 @@ $(BUILD_DIR)/stencil-3d-cuda-mm: stencil-3d-cuda-mm.cu stencil-3d-util.h ../../u
 	nvc++ -O3 -fast -std=c++17 -o $(BUILD_DIR)/stencil-3d-cuda-mm stencil-3d-cuda-mm.cu
 
 $(BUILD_DIR)/stencil-3d-sycl-buffer: stencil-3d-sycl-buffer.cpp stencil-3d-util.h ../../util.h
-	icpx -O3 -march=native -std=c++17 -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Xsycl-target-backend --sycl-gpu-arch=sm_80 -o $(BUILD_DIR)/stencil-3d-sycl-buffer stencil-3d-sycl-buffer.cpp
+	icpx -O3 -march=native -std=c++17 -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Xsycl-target-backend --cuda-gpu-arch=sm_80 -o $(BUILD_DIR)/stencil-3d-sycl-buffer stencil-3d-sycl-buffer.cpp
 
 $(BUILD_DIR)/stencil-3d-sycl-expl: stencil-3d-sycl-expl.cpp stencil-3d-util.h ../../util.h
-	icpx -O3 -march=native -std=c++17 -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Xsycl-target-backend --sycl-gpu-arch=sm_80 -o $(BUILD_DIR)/stencil-3d-sycl-expl stencil-3d-sycl-expl.cpp
+	icpx -O3 -march=native -std=c++17 -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Xsycl-target-backend --cuda-gpu-arch=sm_80 -o $(BUILD_DIR)/stencil-3d-sycl-expl stencil-3d-sycl-expl.cpp
 
 $(BUILD_DIR)/stencil-3d-sycl-mm: stencil-3d-sycl-mm.cpp stencil-3d-util.h ../../util.h
-	icpx -O3 -march=native -std=c++17 -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Xsycl-target-backend --sycl-gpu-arch=sm_80 -o $(BUILD_DIR)/stencil-3d-sycl-mm stencil-3d-sycl-mm.cpp
+	icpx -O3 -march=native -std=c++17 -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Xsycl-target-backend --cuda-gpu-arch=sm_80 -o $(BUILD_DIR)/stencil-3d-sycl-mm stencil-3d-sycl-mm.cpp
 
 $(BUILD_DIR)/stencil-3d-std-par: stencil-3d-std-par.cpp stencil-3d-util.h ../../util.h
 	nvc++ -O3 -std=c++17 -stdpar=gpu -target=gpu -o $(BUILD_DIR)/stencil-3d-std-par stencil-3d-std-par.cpp
 
 $(BUILD_DIR)/stencil-3d-kokkos-serial: stencil-3d-kokkos.cpp stencil-3d-util.h ../../util.h
-	g++ -O3 -march=native -std=c++17 -I/home/hpc/iwia/iwia71/kokkos/install-serial/include -L/home/hpc/iwia/iwia71/kokkos/install-serial/lib64 -o $(BUILD_DIR)/stencil-3d-kokkos-serial stencil-3d-kokkos.cpp -lkokkoscore -ldl
+	g++ -O3 -march=native -std=c++17 -I/home/atuin/unrz/unrz101h/kokkos/install-serial/include -L/home/atuin/unrz/unrz101h/kokkos/install-serial/lib64 -o $(BUILD_DIR)/stencil-3d-kokkos-serial stencil-3d-kokkos.cpp -lkokkoscore -ldl
 
 $(BUILD_DIR)/stencil-3d-kokkos-omp-host: stencil-3d-kokkos.cpp stencil-3d-util.h ../../util.h
-	g++ -O3 -march=native -std=c++17 -fopenmp -I/home/hpc/iwia/iwia71/kokkos/install-omp/include -L/home/hpc/iwia/iwia71/kokkos/install-omp/lib64 -o $(BUILD_DIR)/stencil-3d-kokkos-omp-host stencil-3d-kokkos.cpp -lkokkoscore -ldl
+	g++ -O3 -march=native -std=c++17 -fopenmp -I/home/atuin/unrz/unrz101h/kokkos/install-omp/include -L/home/atuin/unrz/unrz101h/kokkos/install-omp/lib64 -o $(BUILD_DIR)/stencil-3d-kokkos-omp-host stencil-3d-kokkos.cpp -lkokkoscore -ldl
 
 $(BUILD_DIR)/stencil-3d-kokkos-cuda: stencil-3d-kokkos.cpp stencil-3d-util.h ../../util.h
-	/home/hpc/iwia/iwia71/kokkos/install-cuda/bin/nvcc_wrapper -O3 -march=native -std=c++17 -arch=sm_80 --expt-extended-lambda --expt-relaxed-constexpr -I/home/hpc/iwia/iwia71/kokkos/install-cuda/include -L/home/hpc/iwia/iwia71/kokkos/install-cuda/lib64 -o $(BUILD_DIR)/stencil-3d-kokkos-cuda stencil-3d-kokkos.cpp -lkokkoscore -ldl
+	/home/atuin/unrz/unrz101h/kokkos/install-cuda/bin/nvcc_wrapper -O3 -march=native -std=c++17 -arch=sm_80 --expt-extended-lambda --expt-relaxed-constexpr -I/home/atuin/unrz/unrz101h/kokkos/install-cuda/include -L/home/atuin/unrz/unrz101h/kokkos/install-cuda/lib64 -o $(BUILD_DIR)/stencil-3d-kokkos-cuda stencil-3d-kokkos.cpp -lkokkoscore -ldl -lcuda
 
 
 # aliases without build directory
