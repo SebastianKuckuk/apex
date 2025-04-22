@@ -48,19 +48,19 @@ $(BUILD_DIR)/stencil-3d-omp-target-expl: stencil-3d-omp-target-expl.cpp stencil-
 	nvc++ -O3 -std=c++17 -mp=gpu -target=gpu -o $(BUILD_DIR)/stencil-3d-omp-target-expl stencil-3d-omp-target-expl.cpp
 
 $(BUILD_DIR)/stencil-3d-omp-target-mm: stencil-3d-omp-target-mm.cpp stencil-3d-util.h ../../util.h
-	nvc++ -O3 -std=c++17 -mp=gpu -target=gpu -gpu=managed -o $(BUILD_DIR)/stencil-3d-omp-target-mm stencil-3d-omp-target-mm.cpp
+	nvc++ -O3 -std=c++17 -mp=gpu -target=gpu -gpu=mem:unified -o $(BUILD_DIR)/stencil-3d-omp-target-mm stencil-3d-omp-target-mm.cpp
 
 $(BUILD_DIR)/stencil-3d-openacc-expl: stencil-3d-openacc-expl.cpp stencil-3d-util.h ../../util.h
 	nvc++ -O3 -std=c++17 -acc=gpu -target=gpu -o $(BUILD_DIR)/stencil-3d-openacc-expl stencil-3d-openacc-expl.cpp
 
 $(BUILD_DIR)/stencil-3d-openacc-mm: stencil-3d-openacc-mm.cpp stencil-3d-util.h ../../util.h
-	nvc++ -O3 -std=c++17 -acc=gpu -target=gpu -gpu=managed -o $(BUILD_DIR)/stencil-3d-openacc-mm stencil-3d-openacc-mm.cpp
+	nvc++ -O3 -std=c++17 -acc=gpu -target=gpu -gpu=mem:unified -o $(BUILD_DIR)/stencil-3d-openacc-mm stencil-3d-openacc-mm.cpp
 
 $(BUILD_DIR)/stencil-3d-cuda-expl: stencil-3d-cuda-expl.cu stencil-3d-util.h ../../util.h
-	nvc++ -O3 -fast -std=c++17 -o $(BUILD_DIR)/stencil-3d-cuda-expl stencil-3d-cuda-expl.cu
+	nvcc -O3 -std=c++17 -arch=sm_90 --expt-extended-lambda --expt-relaxed-constexpr -o $(BUILD_DIR)/stencil-3d-cuda-expl stencil-3d-cuda-expl.cu
 
 $(BUILD_DIR)/stencil-3d-cuda-mm: stencil-3d-cuda-mm.cu stencil-3d-util.h ../../util.h
-	nvc++ -O3 -fast -std=c++17 -o $(BUILD_DIR)/stencil-3d-cuda-mm stencil-3d-cuda-mm.cu
+	nvcc -O3 -std=c++17 -arch=sm_90 --expt-extended-lambda --expt-relaxed-constexpr -o $(BUILD_DIR)/stencil-3d-cuda-mm stencil-3d-cuda-mm.cu
 
 $(BUILD_DIR)/stencil-3d-sycl-buffer: stencil-3d-sycl-buffer.cpp stencil-3d-util.h ../../util.h
 	icpx -O3 -march=native -std=c++17 -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Xsycl-target-backend --cuda-gpu-arch=sm_90 -o $(BUILD_DIR)/stencil-3d-sycl-buffer stencil-3d-sycl-buffer.cpp

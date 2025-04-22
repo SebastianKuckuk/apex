@@ -48,19 +48,19 @@ $(BUILD_DIR)/init-omp-target-expl: init-omp-target-expl.cpp init-util.h ../../ut
 	nvc++ -O3 -std=c++17 -mp=gpu -target=gpu -o $(BUILD_DIR)/init-omp-target-expl init-omp-target-expl.cpp
 
 $(BUILD_DIR)/init-omp-target-mm: init-omp-target-mm.cpp init-util.h ../../util.h
-	nvc++ -O3 -std=c++17 -mp=gpu -target=gpu -gpu=managed -o $(BUILD_DIR)/init-omp-target-mm init-omp-target-mm.cpp
+	nvc++ -O3 -std=c++17 -mp=gpu -target=gpu -gpu=mem:unified -o $(BUILD_DIR)/init-omp-target-mm init-omp-target-mm.cpp
 
 $(BUILD_DIR)/init-openacc-expl: init-openacc-expl.cpp init-util.h ../../util.h
 	nvc++ -O3 -std=c++17 -acc=gpu -target=gpu -o $(BUILD_DIR)/init-openacc-expl init-openacc-expl.cpp
 
 $(BUILD_DIR)/init-openacc-mm: init-openacc-mm.cpp init-util.h ../../util.h
-	nvc++ -O3 -std=c++17 -acc=gpu -target=gpu -gpu=managed -o $(BUILD_DIR)/init-openacc-mm init-openacc-mm.cpp
+	nvc++ -O3 -std=c++17 -acc=gpu -target=gpu -gpu=mem:unified -o $(BUILD_DIR)/init-openacc-mm init-openacc-mm.cpp
 
 $(BUILD_DIR)/init-cuda-expl: init-cuda-expl.cu init-util.h ../../util.h
-	nvc++ -O3 -fast -std=c++17 -o $(BUILD_DIR)/init-cuda-expl init-cuda-expl.cu
+	nvcc -O3 -std=c++17 -arch=sm_90 --expt-extended-lambda --expt-relaxed-constexpr -o $(BUILD_DIR)/init-cuda-expl init-cuda-expl.cu
 
 $(BUILD_DIR)/init-cuda-mm: init-cuda-mm.cu init-util.h ../../util.h
-	nvc++ -O3 -fast -std=c++17 -o $(BUILD_DIR)/init-cuda-mm init-cuda-mm.cu
+	nvcc -O3 -std=c++17 -arch=sm_90 --expt-extended-lambda --expt-relaxed-constexpr -o $(BUILD_DIR)/init-cuda-mm init-cuda-mm.cu
 
 $(BUILD_DIR)/init-sycl-buffer: init-sycl-buffer.cpp init-util.h ../../util.h
 	icpx -O3 -march=native -std=c++17 -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Xsycl-target-backend --cuda-gpu-arch=sm_90 -o $(BUILD_DIR)/init-sycl-buffer init-sycl-buffer.cpp

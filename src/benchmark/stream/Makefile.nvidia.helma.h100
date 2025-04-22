@@ -48,19 +48,19 @@ $(BUILD_DIR)/stream-omp-target-expl: stream-omp-target-expl.cpp stream-util.h ..
 	nvc++ -O3 -std=c++17 -mp=gpu -target=gpu -o $(BUILD_DIR)/stream-omp-target-expl stream-omp-target-expl.cpp
 
 $(BUILD_DIR)/stream-omp-target-mm: stream-omp-target-mm.cpp stream-util.h ../../util.h
-	nvc++ -O3 -std=c++17 -mp=gpu -target=gpu -gpu=managed -o $(BUILD_DIR)/stream-omp-target-mm stream-omp-target-mm.cpp
+	nvc++ -O3 -std=c++17 -mp=gpu -target=gpu -gpu=mem:unified -o $(BUILD_DIR)/stream-omp-target-mm stream-omp-target-mm.cpp
 
 $(BUILD_DIR)/stream-openacc-expl: stream-openacc-expl.cpp stream-util.h ../../util.h
 	nvc++ -O3 -std=c++17 -acc=gpu -target=gpu -o $(BUILD_DIR)/stream-openacc-expl stream-openacc-expl.cpp
 
 $(BUILD_DIR)/stream-openacc-mm: stream-openacc-mm.cpp stream-util.h ../../util.h
-	nvc++ -O3 -std=c++17 -acc=gpu -target=gpu -gpu=managed -o $(BUILD_DIR)/stream-openacc-mm stream-openacc-mm.cpp
+	nvc++ -O3 -std=c++17 -acc=gpu -target=gpu -gpu=mem:unified -o $(BUILD_DIR)/stream-openacc-mm stream-openacc-mm.cpp
 
 $(BUILD_DIR)/stream-cuda-expl: stream-cuda-expl.cu stream-util.h ../../util.h
-	nvc++ -O3 -fast -std=c++17 -o $(BUILD_DIR)/stream-cuda-expl stream-cuda-expl.cu
+	nvcc -O3 -std=c++17 -arch=sm_90 --expt-extended-lambda --expt-relaxed-constexpr -o $(BUILD_DIR)/stream-cuda-expl stream-cuda-expl.cu
 
 $(BUILD_DIR)/stream-cuda-mm: stream-cuda-mm.cu stream-util.h ../../util.h
-	nvc++ -O3 -fast -std=c++17 -o $(BUILD_DIR)/stream-cuda-mm stream-cuda-mm.cu
+	nvcc -O3 -std=c++17 -arch=sm_90 --expt-extended-lambda --expt-relaxed-constexpr -o $(BUILD_DIR)/stream-cuda-mm stream-cuda-mm.cu
 
 $(BUILD_DIR)/stream-sycl-buffer: stream-sycl-buffer.cpp stream-util.h ../../util.h
 	icpx -O3 -march=native -std=c++17 -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Xsycl-target-backend --cuda-gpu-arch=sm_90 -o $(BUILD_DIR)/stream-sycl-buffer stream-sycl-buffer.cpp

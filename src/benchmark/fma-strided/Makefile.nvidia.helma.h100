@@ -48,19 +48,19 @@ $(BUILD_DIR)/fma-strided-omp-target-expl: fma-strided-omp-target-expl.cpp fma-st
 	nvc++ -O3 -std=c++17 -mp=gpu -target=gpu -o $(BUILD_DIR)/fma-strided-omp-target-expl fma-strided-omp-target-expl.cpp
 
 $(BUILD_DIR)/fma-strided-omp-target-mm: fma-strided-omp-target-mm.cpp fma-strided-util.h ../../util.h
-	nvc++ -O3 -std=c++17 -mp=gpu -target=gpu -gpu=managed -o $(BUILD_DIR)/fma-strided-omp-target-mm fma-strided-omp-target-mm.cpp
+	nvc++ -O3 -std=c++17 -mp=gpu -target=gpu -gpu=mem:unified -o $(BUILD_DIR)/fma-strided-omp-target-mm fma-strided-omp-target-mm.cpp
 
 $(BUILD_DIR)/fma-strided-openacc-expl: fma-strided-openacc-expl.cpp fma-strided-util.h ../../util.h
 	nvc++ -O3 -std=c++17 -acc=gpu -target=gpu -o $(BUILD_DIR)/fma-strided-openacc-expl fma-strided-openacc-expl.cpp
 
 $(BUILD_DIR)/fma-strided-openacc-mm: fma-strided-openacc-mm.cpp fma-strided-util.h ../../util.h
-	nvc++ -O3 -std=c++17 -acc=gpu -target=gpu -gpu=managed -o $(BUILD_DIR)/fma-strided-openacc-mm fma-strided-openacc-mm.cpp
+	nvc++ -O3 -std=c++17 -acc=gpu -target=gpu -gpu=mem:unified -o $(BUILD_DIR)/fma-strided-openacc-mm fma-strided-openacc-mm.cpp
 
 $(BUILD_DIR)/fma-strided-cuda-expl: fma-strided-cuda-expl.cu fma-strided-util.h ../../util.h
-	nvc++ -O3 -fast -std=c++17 -o $(BUILD_DIR)/fma-strided-cuda-expl fma-strided-cuda-expl.cu
+	nvcc -O3 -std=c++17 -arch=sm_90 --expt-extended-lambda --expt-relaxed-constexpr -o $(BUILD_DIR)/fma-strided-cuda-expl fma-strided-cuda-expl.cu
 
 $(BUILD_DIR)/fma-strided-cuda-mm: fma-strided-cuda-mm.cu fma-strided-util.h ../../util.h
-	nvc++ -O3 -fast -std=c++17 -o $(BUILD_DIR)/fma-strided-cuda-mm fma-strided-cuda-mm.cu
+	nvcc -O3 -std=c++17 -arch=sm_90 --expt-extended-lambda --expt-relaxed-constexpr -o $(BUILD_DIR)/fma-strided-cuda-mm fma-strided-cuda-mm.cu
 
 $(BUILD_DIR)/fma-strided-sycl-buffer: fma-strided-sycl-buffer.cpp fma-strided-util.h ../../util.h
 	icpx -O3 -march=native -std=c++17 -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Xsycl-target-backend --cuda-gpu-arch=sm_90 -o $(BUILD_DIR)/fma-strided-sycl-buffer fma-strided-sycl-buffer.cpp
