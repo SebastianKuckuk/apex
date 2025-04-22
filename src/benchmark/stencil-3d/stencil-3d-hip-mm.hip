@@ -34,7 +34,7 @@ inline int realMain(int argc, char *argv[]) {
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        stencil3d<<<ceilingDivide(nx - 1, 16), ceilingDivide(ny - 1, 4), ceilingDivide(nz - 1, 4), 16, 4, 4>>>(u, uNew, nx, ny, nz);
+        stencil3d<<<dim3(ceilingDivide(nx - 1, 16), ceilingDivide(ny - 1, 4), ceilingDivide(nz - 1, 4)), dim3(16, 4, 4)>>>(u, uNew, nx, ny, nz);
         std::swap(u, uNew);
     }
     checkHipError(hipDeviceSynchronize(), true);
@@ -43,7 +43,7 @@ inline int realMain(int argc, char *argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        stencil3d<<<ceilingDivide(nx - 1, 16), ceilingDivide(ny - 1, 4), ceilingDivide(nz - 1, 4), 16, 4, 4>>>(u, uNew, nx, ny, nz);
+        stencil3d<<<dim3(ceilingDivide(nx - 1, 16), ceilingDivide(ny - 1, 4), ceilingDivide(nz - 1, 4)), dim3(16, 4, 4)>>>(u, uNew, nx, ny, nz);
         std::swap(u, uNew);
     }
     checkHipError(hipDeviceSynchronize(), true);

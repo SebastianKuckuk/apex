@@ -33,7 +33,7 @@ inline int realMain(int argc, char *argv[]) {
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        stencil2d<<<ceilingDivide(nx - 1, 16), ceilingDivide(ny - 1, 16), 16, 16>>>(u, uNew, nx, ny);
+        stencil2d<<<dim3(ceilingDivide(nx - 1, 16), ceilingDivide(ny - 1, 16)), dim3(16, 16)>>>(u, uNew, nx, ny);
         std::swap(u, uNew);
     }
     checkCudaError(cudaDeviceSynchronize(), true);
@@ -42,7 +42,7 @@ inline int realMain(int argc, char *argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        stencil2d<<<ceilingDivide(nx - 1, 16), ceilingDivide(ny - 1, 16), 16, 16>>>(u, uNew, nx, ny);
+        stencil2d<<<dim3(ceilingDivide(nx - 1, 16), ceilingDivide(ny - 1, 16)), dim3(16, 16)>>>(u, uNew, nx, ny);
         std::swap(u, uNew);
     }
     checkCudaError(cudaDeviceSynchronize(), true);
