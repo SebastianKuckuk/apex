@@ -5,7 +5,7 @@
 
 template <typename tpe>
 inline void stream(const Kokkos::View<tpe *> &src, Kokkos::View<tpe *> &dest, size_t nx) {
-    Kokkos::parallel_for(
+    Kokkos::parallel_for(                //
         Kokkos::RangePolicy<>(0, nx),    //
         KOKKOS_LAMBDA(const size_t i0) { //
             dest(i0) = src(i0) + 1;

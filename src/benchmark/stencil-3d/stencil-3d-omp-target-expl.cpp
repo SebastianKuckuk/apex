@@ -28,10 +28,8 @@ inline int realMain(int argc, char *argv[]) {
     // init
     initStencil3D(u, uNew, nx, ny, nz);
 
-#pragma omp target enter data map(to \
-                                  : u [0:nx * ny * nz])
-#pragma omp target enter data map(to \
-                                  : uNew [0:nx * ny * nz])
+#pragma omp target enter data map(to : u[0 : nx * ny * nz])
+#pragma omp target enter data map(to : uNew[0 : nx * ny * nz])
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
@@ -51,10 +49,8 @@ inline int realMain(int argc, char *argv[]) {
 
     printStats<tpe>(end - start, nIt, nx * ny * nz, tpeName, sizeof(tpe) + sizeof(tpe), 11);
 
-#pragma omp target exit data map(from \
-                                 : u [0:nx * ny * nz])
-#pragma omp target exit data map(from \
-                                 : uNew [0:nx * ny * nz])
+#pragma omp target exit data map(from : u[0 : nx * ny * nz])
+#pragma omp target exit data map(from : uNew[0 : nx * ny * nz])
 
     // check solution
     checkSolutionStencil3D(u, uNew, nx, ny, nz, nIt + nItWarmUp);

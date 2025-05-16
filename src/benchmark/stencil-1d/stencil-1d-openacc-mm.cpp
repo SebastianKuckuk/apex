@@ -3,7 +3,7 @@
 
 template <typename tpe>
 inline void stencil1d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, size_t nx) {
-#pragma acc parallel loop present(u [0:nx], uNew [0:nx])
+#pragma acc parallel loop present(u[0 : nx], uNew[0 : nx])
     for (size_t i0 = 1; i0 < nx - 1; ++i0) {
         uNew[i0] = 0.5 * u[i0 + 1] + 0.5 * u[i0 - 1];
     }

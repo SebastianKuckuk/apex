@@ -5,7 +5,7 @@
 
 template <typename tpe>
 inline void squareroot(const Kokkos::View<tpe *> &src, Kokkos::View<tpe *> &dest, size_t nx) {
-    Kokkos::parallel_for(
+    Kokkos::parallel_for(                //
         Kokkos::RangePolicy<>(0, nx),    //
         KOKKOS_LAMBDA(const size_t i0) { //
             tpe acc = src(i0);

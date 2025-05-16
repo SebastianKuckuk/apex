@@ -5,7 +5,7 @@
 
 template <typename tpe>
 inline void fmastrided(Kokkos::View<tpe *> &data, size_t nx, size_t stride) {
-    Kokkos::parallel_for(
+    Kokkos::parallel_for(                      //
         Kokkos::RangePolicy<>(0, nx * stride), //
         KOKKOS_LAMBDA(const size_t i0) {       //
             tpe a = (tpe)0.5, b = (tpe)1;

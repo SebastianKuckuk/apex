@@ -3,7 +3,7 @@
 
 template <typename tpe>
 inline void fmastrided(tpe *__restrict__ data, size_t nx, size_t stride) {
-#pragma acc parallel loop present(data [0:nx * stride])
+#pragma acc parallel loop present(data[0 : nx * stride])
     for (size_t i0 = 0; i0 < nx * stride; ++i0) {
         tpe a = (tpe)0.5, b = (tpe)1;
         // dummy op to prevent compiler from solving loop analytically

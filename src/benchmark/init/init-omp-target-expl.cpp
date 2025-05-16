@@ -22,8 +22,7 @@ inline int realMain(int argc, char *argv[]) {
     // init
     initInit(data, nx);
 
-#pragma omp target enter data map(to \
-                                  : data [0:nx])
+#pragma omp target enter data map(to : data[0 : nx])
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
@@ -41,8 +40,7 @@ inline int realMain(int argc, char *argv[]) {
 
     printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe), 0);
 
-#pragma omp target exit data map(from \
-                                 : data [0:nx])
+#pragma omp target exit data map(from : data[0 : nx])
 
     // check solution
     checkSolutionInit(data, nx, nIt + nItWarmUp);

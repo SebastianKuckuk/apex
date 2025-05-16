@@ -5,7 +5,7 @@
 
 template <typename tpe>
 inline void streamstrided(const Kokkos::View<tpe *> &src, Kokkos::View<tpe *> &dest, size_t nx, size_t strideRead, size_t strideWrite) {
-    Kokkos::parallel_for(
+    Kokkos::parallel_for(                //
         Kokkos::RangePolicy<>(0, nx),    //
         KOKKOS_LAMBDA(const size_t i0) { //
             dest(i0 * strideWrite) = src(i0 * strideRead) + 1;

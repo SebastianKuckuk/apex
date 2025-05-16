@@ -3,7 +3,7 @@
 
 template <typename tpe>
 inline void streamstrided(const tpe *const __restrict__ src, tpe *__restrict__ dest, size_t nx, size_t strideRead, size_t strideWrite) {
-#pragma acc parallel loop present(src [0:nx * std::max(strideRead, strideWrite)], dest [0:nx * std::max(strideRead, strideWrite)])
+#pragma acc parallel loop present(src[0 : nx * std::max(strideRead, strideWrite)], dest[0 : nx * std::max(strideRead, strideWrite)])
     for (size_t i0 = 0; i0 < nx; ++i0) {
         dest[i0 * strideWrite] = src[i0 * strideRead] + 1;
     }

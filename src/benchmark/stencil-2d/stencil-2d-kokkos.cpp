@@ -5,7 +5,7 @@
 
 template <typename tpe>
 inline void stencil2d(const Kokkos::View<tpe **> &u, Kokkos::View<tpe **> &uNew, size_t nx, size_t ny) {
-    Kokkos::parallel_for(
+    Kokkos::parallel_for(                                                                                   //
         Kokkos::MDRangePolicy<Kokkos::Rank<2>, Kokkos::Schedule<Kokkos::Static>>({1, 1}, {nx - 1, ny - 1}), //
         KOKKOS_LAMBDA(const size_t i0, const size_t i1) {                                                   //
             uNew(i0, i1) = 0.25 * u(i0 + 1, i1) + 0.25 * u(i0 - 1, i1) + 0.25 * u(i0, i1 + 1) + 0.25 * u(i0, i1 - 1);

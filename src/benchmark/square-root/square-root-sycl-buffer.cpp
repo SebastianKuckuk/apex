@@ -6,8 +6,8 @@
 template <typename tpe>
 inline void squareroot(sycl::queue &q, sycl::buffer<tpe> &b_src, sycl::buffer<tpe> &b_dest, size_t nx) {
     q.submit([&](sycl::handler &h) {
-        auto src = b_src.get_access(h, sycl::read_only);
         auto dest = b_dest.get_access(h, sycl::write_only);
+        auto src = b_src.get_access(h, sycl::read_only);
 
         h.parallel_for(nx, [=](auto i0) {
             if (i0 < nx) {

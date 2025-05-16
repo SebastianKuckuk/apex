@@ -41,8 +41,7 @@ inline int realMain(int argc, char *argv[]) {
     // init
     initFmaStrided(data, nx, stride);
 
-#pragma omp target enter data map(to \
-                                  : data [0:nx * stride])
+#pragma omp target enter data map(to : data[0 : nx * stride])
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
@@ -60,8 +59,7 @@ inline int realMain(int argc, char *argv[]) {
 
     printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe), 131072);
 
-#pragma omp target exit data map(from \
-                                 : data [0:nx * stride])
+#pragma omp target exit data map(from : data[0 : nx * stride])
 
     // check solution
     checkSolutionFmaStrided(data, nx, nIt + nItWarmUp, stride);

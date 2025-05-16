@@ -3,7 +3,7 @@
 
 template <typename tpe>
 inline void fma(tpe *__restrict__ data, size_t nx) {
-#pragma acc parallel loop present(data [0:nx])
+#pragma acc parallel loop present(data[0 : nx])
     for (size_t i0 = 0; i0 < nx; ++i0) {
         tpe a = (tpe)0.5, b = (tpe)1;
         // dummy op to prevent compiler from solving loop analytically

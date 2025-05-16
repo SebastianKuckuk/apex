@@ -24,10 +24,8 @@ inline int realMain(int argc, char *argv[]) {
     // init
     initStream(dest, src, nx);
 
-#pragma omp target enter data map(to \
-                                  : dest [0:nx])
-#pragma omp target enter data map(to \
-                                  : src [0:nx])
+#pragma omp target enter data map(to : dest[0 : nx])
+#pragma omp target enter data map(to : src[0 : nx])
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
@@ -47,10 +45,8 @@ inline int realMain(int argc, char *argv[]) {
 
     printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe) + sizeof(tpe), 1);
 
-#pragma omp target exit data map(from \
-                                 : dest [0:nx])
-#pragma omp target exit data map(from \
-                                 : src [0:nx])
+#pragma omp target exit data map(from : dest[0 : nx])
+#pragma omp target exit data map(from : src[0 : nx])
 
     // check solution
     checkSolutionStream(dest, src, nx, nIt + nItWarmUp);

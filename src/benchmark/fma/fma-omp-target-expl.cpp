@@ -37,8 +37,7 @@ inline int realMain(int argc, char *argv[]) {
     // init
     initFma(data, nx);
 
-#pragma omp target enter data map(to \
-                                  : data [0:nx])
+#pragma omp target enter data map(to : data[0 : nx])
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
@@ -56,8 +55,7 @@ inline int realMain(int argc, char *argv[]) {
 
     printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe), 131072);
 
-#pragma omp target exit data map(from \
-                                 : data [0:nx])
+#pragma omp target exit data map(from : data[0 : nx])
 
     // check solution
     checkSolutionFma(data, nx, nIt + nItWarmUp);

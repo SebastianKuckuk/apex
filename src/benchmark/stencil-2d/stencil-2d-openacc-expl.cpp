@@ -3,7 +3,7 @@
 
 template <typename tpe>
 inline void stencil2d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, size_t nx, size_t ny) {
-#pragma acc parallel loop present(u [0:nx * ny], uNew [0:nx * ny]) collapse(2)
+#pragma acc parallel loop present(u[0 : nx * ny], uNew[0 : nx * ny]) collapse(2)
     for (size_t i1 = 1; i1 < ny - 1; ++i1) {
         for (size_t i0 = 1; i0 < nx - 1; ++i0) {
             uNew[i0 + i1 * nx] = 0.25 * u[i0 + i1 * nx + 1] + 0.25 * u[i0 + i1 * nx - 1] + 0.25 * u[i0 + nx * (i1 + 1)] + 0.25 * u[i0 + nx * (i1 - 1)];
@@ -26,8 +26,8 @@ inline int realMain(int argc, char *argv[]) {
     // init
     initStencil2D(u, uNew, nx, ny);
 
-#pragma acc enter data copyin(u [0:nx * ny])
-#pragma acc enter data copyin(uNew [0:nx * ny])
+#pragma acc enter data copyin(u[0 : nx * ny])
+#pragma acc enter data copyin(uNew[0 : nx * ny])
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
@@ -47,8 +47,8 @@ inline int realMain(int argc, char *argv[]) {
 
     printStats<tpe>(end - start, nIt, nx * ny, tpeName, sizeof(tpe) + sizeof(tpe), 7);
 
-#pragma acc exit data copyout(u [0:nx * ny])
-#pragma acc exit data copyout(uNew [0:nx * ny])
+#pragma acc exit data copyout(u[0 : nx * ny])
+#pragma acc exit data copyout(uNew[0 : nx * ny])
 
     // check solution
     checkSolutionStencil2D(u, uNew, nx, ny, nIt + nItWarmUp);
