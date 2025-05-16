@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../../util.h"
 
 
@@ -17,8 +19,7 @@ inline void checkSolutionStreamStrided(const tpe *const __restrict__ dest, const
     }
 
     if (total <= 0 || total > nx * nIt)
-        std::cerr << "StreamStrided check failed "
-                  << " (expected value between 0+ and " << nx * nIt << " but got " << total << ")" << std::endl;
+        std::cerr << "StreamStrided check failed " << " (expected value between 0+ and " << nx * nIt << " but got " << total << ")" << std::endl;
 }
 
 inline void parseCLA_1d(int argc, char **argv, char *&tpeName, size_t &nx, size_t &strideRead, size_t &strideWrite, size_t &nItWarmUp, size_t &nIt) {
