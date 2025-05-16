@@ -72,16 +72,16 @@ $(BUILD_DIR)/stream-sycl-mm: stream-sycl-mm.cpp stream-util.h ../../util.h
 	icpx -O3 -march=native -std=c++17 -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Xsycl-target-backend --cuda-gpu-arch=sm_86 -o $(BUILD_DIR)/stream-sycl-mm stream-sycl-mm.cpp
 
 $(BUILD_DIR)/stream-std-par: stream-std-par.cpp stream-util.h ../../util.h
-	nvc++ -O3 -std=c++17 -stdpar=gpu -target=gpu -o $(BUILD_DIR)/stream-std-par stream-std-par.cpp
+	nvc++ -O3 -std=c++17 -stdpar=gpu -target=gpu -gpu=cc86 -o $(BUILD_DIR)/stream-std-par stream-std-par.cpp
 
 $(BUILD_DIR)/stream-kokkos-serial: stream-kokkos.cpp stream-util.h ../../util.h
-	g++ -O3 -march=native -std=c++17 -I/home/atuin/unrz/unrz101h/kokkos/install-serial/include -L/home/atuin/unrz/unrz101h/kokkos/install-serial/lib64 -o $(BUILD_DIR)/stream-kokkos-serial stream-kokkos.cpp -lkokkoscore -ldl
+	g++ -O3 -march=native -std=c++17 -I$(WORK)/kokkos/install-serial/include -L$(WORK)/kokkos/install-serial/lib64 -o $(BUILD_DIR)/stream-kokkos-serial stream-kokkos.cpp -lkokkoscore -ldl
 
 $(BUILD_DIR)/stream-kokkos-omp-host: stream-kokkos.cpp stream-util.h ../../util.h
-	g++ -O3 -march=native -std=c++17 -fopenmp -I/home/atuin/unrz/unrz101h/kokkos/install-omp/include -L/home/atuin/unrz/unrz101h/kokkos/install-omp/lib64 -o $(BUILD_DIR)/stream-kokkos-omp-host stream-kokkos.cpp -lkokkoscore -ldl
+	g++ -O3 -march=native -std=c++17 -fopenmp -I$(WORK)/kokkos/install-omp/include -L$(WORK)/kokkos/install-omp/lib64 -o $(BUILD_DIR)/stream-kokkos-omp-host stream-kokkos.cpp -lkokkoscore -ldl
 
 $(BUILD_DIR)/stream-kokkos-cuda: stream-kokkos.cpp stream-util.h ../../util.h
-	/home/atuin/unrz/unrz101h/kokkos/install-cuda/bin/nvcc_wrapper -O3 -march=native -std=c++17 -arch=sm_86 --expt-extended-lambda --expt-relaxed-constexpr -I/home/atuin/unrz/unrz101h/kokkos/install-cuda/include -L/home/atuin/unrz/unrz101h/kokkos/install-cuda/lib64 -o $(BUILD_DIR)/stream-kokkos-cuda stream-kokkos.cpp -lkokkoscore -ldl -lcuda
+	$(WORK)/kokkos/install-cuda/bin/nvcc_wrapper -O3 -march=native -std=c++17 -arch=sm_86 --expt-extended-lambda --expt-relaxed-constexpr -I$(WORK)/kokkos/install-cuda/include -L$(WORK)/kokkos/install-cuda/lib64 -o $(BUILD_DIR)/stream-kokkos-cuda stream-kokkos.cpp -lkokkoscore -ldl -lcuda
 
 
 # aliases without build directory
