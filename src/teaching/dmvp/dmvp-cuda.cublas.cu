@@ -13,22 +13,6 @@
 
 
 template <typename tpe>
-__global__ void dmvp(size_t nx, const tpe *const __restrict__ mat, const tpe *const __restrict__ src, tpe *__restrict__ dest) {
-    auto rStart = blockIdx.x * blockDim.x + threadIdx.x;
-    auto rStride = gridDim.x * blockDim.x;
-    auto cStart = blockIdx.y * blockDim.y + threadIdx.y;
-    auto cStride = gridDim.y * blockDim.y;
-
-    for (size_t r = rStart; r < nx; r += rStride) {
-        auto acc = 0.;
-        for (size_t c = cStart; c < nx; c += cStride)
-            acc += mat[r * nx + c] * src[c];
-        atomicAdd(&dest[r], acc);
-    }
-}
-
-
-template <typename tpe>
 inline int realMain(int argc, char *argv[]) {
     char *tpeName;
     size_t nx, nItWarmUp, nIt;
