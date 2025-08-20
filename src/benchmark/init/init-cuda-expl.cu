@@ -26,7 +26,7 @@ inline int realMain(int argc, char *argv[]) {
     checkCudaError(cudaMalloc((void **)&d_data, sizeof(tpe) * nx));
 
     // init
-    initInit(data, nx);
+    initInit<tpe>(data, nx);
 
     checkCudaError(cudaMemcpy(d_data, data, sizeof(tpe) * nx, cudaMemcpyHostToDevice));
 
@@ -51,7 +51,7 @@ inline int realMain(int argc, char *argv[]) {
     checkCudaError(cudaMemcpy(data, d_data, sizeof(tpe) * nx, cudaMemcpyDeviceToHost));
 
     // check solution
-    checkSolutionInit(data, nx, nIt + nItWarmUp);
+    checkSolutionInit<tpe>(data, nx, nIt + nItWarmUp);
 
     checkCudaError(cudaFree(d_data));
 

@@ -29,7 +29,7 @@ inline int realMain(int argc, char *argv[]) {
     data = new tpe[nx];
 
     // init
-    initInit(data, nx);
+    initInit<tpe>(data, nx);
 
     {
         sycl::buffer b_data(data, sycl::range(nx));
@@ -54,7 +54,7 @@ inline int realMain(int argc, char *argv[]) {
     } // implicit D-H copy of destroyed buffers
 
     // check solution
-    checkSolutionInit(data, nx, nIt + nItWarmUp);
+    checkSolutionInit<tpe>(data, nx, nIt + nItWarmUp);
 
     delete[] data;
 

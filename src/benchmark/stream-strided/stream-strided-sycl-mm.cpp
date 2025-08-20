@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-inline void streamstrided(sycl::queue &q, const tpe *const __restrict__ src, tpe *__restrict__ dest, size_t nx, size_t strideRead, size_t strideWrite) {
+inline void streamStrided(sycl::queue &q, const tpe *__restrict__ src, tpe *__restrict__ dest, size_t nx, size_t strideRead, size_t strideWrite) {
     q.submit([&](sycl::handler &h) {
         h.parallel_for(nx, [=](auto i0) {
             if (i0 < nx) {
@@ -31,11 +31,11 @@ inline int realMain(int argc, char *argv[]) {
     src = sycl::malloc_shared<tpe>(nx * std::max(strideRead, strideWrite), q);
 
     // init
-    initStreamStrided(dest, src, nx, strideRead, strideWrite);
+    initStreamStrided<tpe>(dest, src, nx, strideRead, strideWrite);
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        streamstrided(q, src, dest, nx, strideRead, strideWrite);
+        streamStrided(q, src, dest, nx, strideRead, strideWrite);
         std::swap(src, dest);
     }
     q.wait();
@@ -44,7 +44,7 @@ inline int realMain(int argc, char *argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        streamstrided(q, src, dest, nx, strideRead, strideWrite);
+        streamStrided(q, src, dest, nx, strideRead, strideWrite);
         std::swap(src, dest);
     }
     q.wait();
@@ -54,7 +54,7 @@ inline int realMain(int argc, char *argv[]) {
     printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe) + sizeof(tpe), 1);
 
     // check solution
-    checkSolutionStreamStrided(dest, src, nx, nIt + nItWarmUp, strideRead, strideWrite);
+    checkSolutionStreamStrided<tpe>(dest, src, nx, nIt + nItWarmUp, strideRead, strideWrite);
 
     sycl::free(dest, q);
     sycl::free(src, q);

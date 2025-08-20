@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-inline void fmastrided(sycl::queue &q, sycl::buffer<tpe> &b_data, size_t nx, size_t stride) {
+inline void fmaStrided(sycl::queue &q, sycl::buffer<tpe> &b_data, size_t nx, size_t stride) {
     q.submit([&](sycl::handler &h) {
         auto data = b_data.get_access(h, sycl::write_only);
 
@@ -48,14 +48,14 @@ inline int realMain(int argc, char *argv[]) {
     data = new tpe[nx * stride];
 
     // init
-    initFmaStrided(data, nx, stride);
+    initFmaStrided<tpe>(data, nx, stride);
 
     {
         sycl::buffer b_data(data, sycl::range(nx * stride));
 
         // warm-up
         for (size_t i = 0; i < nItWarmUp; ++i) {
-            fmastrided(q, b_data, nx, stride);
+            fmaStrided(q, b_data, nx, stride);
         }
         q.wait();
 
@@ -63,7 +63,7 @@ inline int realMain(int argc, char *argv[]) {
         auto start = std::chrono::steady_clock::now();
 
         for (size_t i = 0; i < nIt; ++i) {
-            fmastrided(q, b_data, nx, stride);
+            fmaStrided(q, b_data, nx, stride);
         }
         q.wait();
 
@@ -73,7 +73,7 @@ inline int realMain(int argc, char *argv[]) {
     } // implicit D-H copy of destroyed buffers
 
     // check solution
-    checkSolutionFmaStrided(data, nx, nIt + nItWarmUp, stride);
+    checkSolutionFmaStrided<tpe>(data, nx, nIt + nItWarmUp, stride);
 
     delete[] data;
 

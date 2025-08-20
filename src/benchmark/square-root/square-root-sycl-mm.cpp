@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-inline void squareroot(sycl::queue &q, const tpe *const __restrict__ src, tpe *__restrict__ dest, size_t nx) {
+inline void squareRoot(sycl::queue &q, const tpe *__restrict__ src, tpe *__restrict__ dest, size_t nx) {
     q.submit([&](sycl::handler &h) {
         h.parallel_for(nx, [=](auto i0) {
             if (i0 < nx) {
@@ -34,11 +34,11 @@ inline int realMain(int argc, char *argv[]) {
     src = sycl::malloc_shared<tpe>(nx, q);
 
     // init
-    initSquareRoot(dest, src, nx);
+    initSquareRoot<tpe>(dest, src, nx);
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        squareroot(q, src, dest, nx);
+        squareRoot(q, src, dest, nx);
         std::swap(src, dest);
     }
     q.wait();
@@ -47,7 +47,7 @@ inline int realMain(int argc, char *argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        squareroot(q, src, dest, nx);
+        squareRoot(q, src, dest, nx);
         std::swap(src, dest);
     }
     q.wait();
@@ -57,7 +57,7 @@ inline int realMain(int argc, char *argv[]) {
     printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe) + sizeof(tpe), 65536);
 
     // check solution
-    checkSolutionSquareRoot(dest, src, nx, nIt + nItWarmUp);
+    checkSolutionSquareRoot<tpe>(dest, src, nx, nIt + nItWarmUp);
 
     sycl::free(dest, q);
     sycl::free(src, q);

@@ -42,7 +42,7 @@ inline int realMain(int argc, char *argv[]) {
     data = sycl::malloc_shared<tpe>(nx, q);
 
     // init
-    initFma(data, nx);
+    initFma<tpe>(data, nx);
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
@@ -63,7 +63,7 @@ inline int realMain(int argc, char *argv[]) {
     printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe), 131072);
 
     // check solution
-    checkSolutionFma(data, nx, nIt + nItWarmUp);
+    checkSolutionFma<tpe>(data, nx, nIt + nItWarmUp);
 
     sycl::free(data, q);
 

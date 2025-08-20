@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-inline void squareroot(sycl::queue &q, sycl::buffer<tpe> &b_src, sycl::buffer<tpe> &b_dest, size_t nx) {
+inline void squareRoot(sycl::queue &q, sycl::buffer<tpe> &b_src, sycl::buffer<tpe> &b_dest, size_t nx) {
     q.submit([&](sycl::handler &h) {
         auto dest = b_dest.get_access(h, sycl::write_only);
         auto src = b_src.get_access(h, sycl::read_only);
@@ -37,7 +37,7 @@ inline int realMain(int argc, char *argv[]) {
     src = new tpe[nx];
 
     // init
-    initSquareRoot(dest, src, nx);
+    initSquareRoot<tpe>(dest, src, nx);
 
     {
         sycl::buffer b_dest(dest, sycl::range(nx));
@@ -45,7 +45,7 @@ inline int realMain(int argc, char *argv[]) {
 
         // warm-up
         for (size_t i = 0; i < nItWarmUp; ++i) {
-            squareroot(q, b_src, b_dest, nx);
+            squareRoot(q, b_src, b_dest, nx);
             std::swap(b_src, b_dest);
         }
         q.wait();
@@ -54,7 +54,7 @@ inline int realMain(int argc, char *argv[]) {
         auto start = std::chrono::steady_clock::now();
 
         for (size_t i = 0; i < nIt; ++i) {
-            squareroot(q, b_src, b_dest, nx);
+            squareRoot(q, b_src, b_dest, nx);
             std::swap(b_src, b_dest);
         }
         q.wait();
@@ -65,7 +65,7 @@ inline int realMain(int argc, char *argv[]) {
     } // implicit D-H copy of destroyed buffers
 
     // check solution
-    checkSolutionSquareRoot(dest, src, nx, nIt + nItWarmUp);
+    checkSolutionSquareRoot<tpe>(dest, src, nx, nIt + nItWarmUp);
 
     delete[] dest;
     delete[] src;

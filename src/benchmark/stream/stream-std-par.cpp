@@ -5,7 +5,7 @@
 
 
 template <typename tpe>
-inline void stream(const tpe *const __restrict__ src, tpe *__restrict__ dest, size_t nx) {
+inline void stream(const tpe *__restrict__ src, tpe *__restrict__ dest, size_t nx) {
     std::for_each(std::execution::par_unseq, src, src + nx, //
                   [=](const tpe &src_item) {                //
                       const size_t i0 = &src_item - src;
@@ -27,7 +27,7 @@ inline int realMain(int argc, char *argv[]) {
     src = new tpe[nx];
 
     // init
-    initStream(dest, src, nx);
+    initStream<tpe>(dest, src, nx);
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
@@ -48,7 +48,7 @@ inline int realMain(int argc, char *argv[]) {
     printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe) + sizeof(tpe), 1);
 
     // check solution
-    checkSolutionStream(dest, src, nx, nIt + nItWarmUp);
+    checkSolutionStream<tpe>(dest, src, nx, nIt + nItWarmUp);
 
     delete[] dest;
     delete[] src;

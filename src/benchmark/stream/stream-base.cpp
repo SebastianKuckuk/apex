@@ -2,7 +2,7 @@
 
 
 template <typename tpe>
-inline void stream(const tpe *const __restrict__ src, tpe *__restrict__ dest, size_t nx) {
+inline void stream(const tpe *__restrict__ src, tpe *__restrict__ dest, size_t nx) {
     for (size_t i0 = 0; i0 < nx; ++i0) {
         dest[i0] = src[i0] + 1;
     }
@@ -21,7 +21,7 @@ inline int realMain(int argc, char *argv[]) {
     src = new tpe[nx];
 
     // init
-    initStream(dest, src, nx);
+    initStream<tpe>(dest, src, nx);
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
@@ -42,7 +42,7 @@ inline int realMain(int argc, char *argv[]) {
     printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe) + sizeof(tpe), 1);
 
     // check solution
-    checkSolutionStream(dest, src, nx, nIt + nItWarmUp);
+    checkSolutionStream<tpe>(dest, src, nx, nIt + nItWarmUp);
 
     delete[] dest;
     delete[] src;

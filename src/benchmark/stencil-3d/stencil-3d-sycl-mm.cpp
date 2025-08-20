@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-inline void stencil3d(sycl::queue &q, const tpe *const __restrict__ u, tpe *__restrict__ uNew, size_t nx, size_t ny, size_t nz) {
+inline void stencil3D(sycl::queue &q, const tpe *__restrict__ u, tpe *__restrict__ uNew, size_t nx, size_t ny, size_t nz) {
     q.submit([&](sycl::handler &h) {
         h.parallel_for(sycl::nd_range<3>(sycl::range<3>(ceilToMultipleOf(nz - 1, 4), ceilToMultipleOf(ny - 1, 4), ceilToMultipleOf(nx - 1, 16)), sycl::range<3>(4, 4, 16)), [=](sycl::nd_item<3> item) {
             const auto i0 = item.get_global_id(2);
@@ -33,11 +33,11 @@ inline int realMain(int argc, char *argv[]) {
     uNew = sycl::malloc_shared<tpe>(nx * ny * nz, q);
 
     // init
-    initStencil3D(u, uNew, nx, ny, nz);
+    initStencil3D<tpe>(u, uNew, nx, ny, nz);
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        stencil3d(q, u, uNew, nx, ny, nz);
+        stencil3D(q, u, uNew, nx, ny, nz);
         std::swap(u, uNew);
     }
     q.wait();
@@ -46,7 +46,7 @@ inline int realMain(int argc, char *argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        stencil3d(q, u, uNew, nx, ny, nz);
+        stencil3D(q, u, uNew, nx, ny, nz);
         std::swap(u, uNew);
     }
     q.wait();
@@ -56,7 +56,7 @@ inline int realMain(int argc, char *argv[]) {
     printStats<tpe>(end - start, nIt, nx * ny * nz, tpeName, sizeof(tpe) + sizeof(tpe), 11);
 
     // check solution
-    checkSolutionStencil3D(u, uNew, nx, ny, nz, nIt + nItWarmUp);
+    checkSolutionStencil3D<tpe>(u, uNew, nx, ny, nz, nIt + nItWarmUp);
 
     sycl::free(u, q);
     sycl::free(uNew, q);

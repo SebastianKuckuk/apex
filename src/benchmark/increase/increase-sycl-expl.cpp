@@ -30,7 +30,7 @@ inline int realMain(int argc, char *argv[]) {
     d_data = sycl::malloc_device<tpe>(nx, q);
 
     // init
-    initIncrease(data, nx);
+    initIncrease<tpe>(data, nx);
 
     q.memcpy(d_data, data, sizeof(tpe) * nx);
     q.wait();
@@ -57,7 +57,7 @@ inline int realMain(int argc, char *argv[]) {
     q.wait();
 
     // check solution
-    checkSolutionIncrease(data, nx, nIt + nItWarmUp);
+    checkSolutionIncrease<tpe>(data, nx, nIt + nItWarmUp);
 
     sycl::free(d_data, q);
 

@@ -4,10 +4,10 @@
 
 
 template <typename tpe>
-inline void streamstrided(sycl::queue &q, sycl::buffer<tpe> &b_src, sycl::buffer<tpe> &b_dest, size_t nx, size_t strideRead, size_t strideWrite) {
+inline void streamStrided(sycl::queue &q, sycl::buffer<tpe> &b_src, sycl::buffer<tpe> &b_dest, size_t nx, size_t strideRead, size_t strideWrite) {
     q.submit([&](sycl::handler &h) {
-        auto src = b_src.get_access(h, sycl::read_only);
         auto dest = b_dest.get_access(h, sycl::write_only);
+        auto src = b_src.get_access(h, sycl::read_only);
 
         h.parallel_for(nx, [=](auto i0) {
             if (i0 < nx) {
@@ -34,7 +34,7 @@ inline int realMain(int argc, char *argv[]) {
     src = new tpe[nx * std::max(strideRead, strideWrite)];
 
     // init
-    initStreamStrided(dest, src, nx, strideRead, strideWrite);
+    initStreamStrided<tpe>(dest, src, nx, strideRead, strideWrite);
 
     {
         sycl::buffer b_dest(dest, sycl::range(nx * std::max(strideRead, strideWrite)));
@@ -42,7 +42,7 @@ inline int realMain(int argc, char *argv[]) {
 
         // warm-up
         for (size_t i = 0; i < nItWarmUp; ++i) {
-            streamstrided(q, b_src, b_dest, nx, strideRead, strideWrite);
+            streamStrided(q, b_src, b_dest, nx, strideRead, strideWrite);
             std::swap(b_src, b_dest);
         }
         q.wait();
@@ -51,7 +51,7 @@ inline int realMain(int argc, char *argv[]) {
         auto start = std::chrono::steady_clock::now();
 
         for (size_t i = 0; i < nIt; ++i) {
-            streamstrided(q, b_src, b_dest, nx, strideRead, strideWrite);
+            streamStrided(q, b_src, b_dest, nx, strideRead, strideWrite);
             std::swap(b_src, b_dest);
         }
         q.wait();
@@ -62,7 +62,7 @@ inline int realMain(int argc, char *argv[]) {
     } // implicit D-H copy of destroyed buffers
 
     // check solution
-    checkSolutionStreamStrided(dest, src, nx, nIt + nItWarmUp, strideRead, strideWrite);
+    checkSolutionStreamStrided<tpe>(dest, src, nx, nIt + nItWarmUp, strideRead, strideWrite);
 
     delete[] dest;
     delete[] src;

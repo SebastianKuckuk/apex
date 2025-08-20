@@ -21,7 +21,7 @@ inline void initStencil3D(tpe *__restrict__ u, tpe *__restrict__ uNew, size_t nx
 }
 
 template <typename tpe>
-inline void checkSolutionStencil3D(const tpe *const __restrict__ u, const tpe *const __restrict__ uNew, size_t nx, size_t ny, size_t nz, size_t nIt) {
+inline void checkSolutionStencil3D(const tpe *__restrict__ u, const tpe *__restrict__ uNew, size_t nx, size_t ny, size_t nz, size_t nIt) {
     tpe res = 0;
     for (size_t i2 = 1; i2 < nz - 1; ++i2) {
         for (size_t i1 = 1; i1 < ny - 1; ++i1) {

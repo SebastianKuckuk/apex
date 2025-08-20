@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-inline void stencil2d(sycl::queue &q, sycl::buffer<tpe> &b_u, sycl::buffer<tpe> &b_uNew, size_t nx, size_t ny) {
+inline void stencil2D(sycl::queue &q, sycl::buffer<tpe> &b_u, sycl::buffer<tpe> &b_uNew, size_t nx, size_t ny) {
     q.submit([&](sycl::handler &h) {
         auto u = b_u.get_access(h, sycl::read_only);
         auto uNew = b_uNew.get_access(h, sycl::write_only);
@@ -35,7 +35,7 @@ inline int realMain(int argc, char *argv[]) {
     uNew = new tpe[nx * ny];
 
     // init
-    initStencil2D(u, uNew, nx, ny);
+    initStencil2D<tpe>(u, uNew, nx, ny);
 
     {
         sycl::buffer b_u(u, sycl::range(nx * ny));
@@ -43,7 +43,7 @@ inline int realMain(int argc, char *argv[]) {
 
         // warm-up
         for (size_t i = 0; i < nItWarmUp; ++i) {
-            stencil2d(q, b_u, b_uNew, nx, ny);
+            stencil2D(q, b_u, b_uNew, nx, ny);
             std::swap(b_u, b_uNew);
         }
         q.wait();
@@ -52,7 +52,7 @@ inline int realMain(int argc, char *argv[]) {
         auto start = std::chrono::steady_clock::now();
 
         for (size_t i = 0; i < nIt; ++i) {
-            stencil2d(q, b_u, b_uNew, nx, ny);
+            stencil2D(q, b_u, b_uNew, nx, ny);
             std::swap(b_u, b_uNew);
         }
         q.wait();
@@ -63,7 +63,7 @@ inline int realMain(int argc, char *argv[]) {
     } // implicit D-H copy of destroyed buffers
 
     // check solution
-    checkSolutionStencil2D(u, uNew, nx, ny, nIt + nItWarmUp);
+    checkSolutionStencil2D<tpe>(u, uNew, nx, ny, nIt + nItWarmUp);
 
     delete[] u;
     delete[] uNew;

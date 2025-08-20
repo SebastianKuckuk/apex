@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-inline void fmastrided(Kokkos::View<tpe *> &data, size_t nx, size_t stride) {
+inline void fmaStrided(Kokkos::View<tpe *> &data, size_t nx, size_t stride) {
     Kokkos::parallel_for(                      //
         Kokkos::RangePolicy<>(0, nx * stride), //
         KOKKOS_LAMBDA(const size_t i0) {       //
@@ -52,7 +52,7 @@ inline int realMain(int argc, char *argv[]) {
 
         // warm-up
         for (size_t i = 0; i < nItWarmUp; ++i) {
-            fmastrided(data, nx, stride);
+            fmaStrided(data, nx, stride);
         }
         Kokkos::fence();
 
@@ -60,7 +60,7 @@ inline int realMain(int argc, char *argv[]) {
         auto start = std::chrono::steady_clock::now();
 
         for (size_t i = 0; i < nIt; ++i) {
-            fmastrided(data, nx, stride);
+            fmaStrided(data, nx, stride);
         }
         Kokkos::fence();
 

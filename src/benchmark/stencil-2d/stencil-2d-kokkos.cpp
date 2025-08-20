@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-inline void stencil2d(const Kokkos::View<tpe **> &u, Kokkos::View<tpe **> &uNew, size_t nx, size_t ny) {
+inline void stencil2D(const Kokkos::View<tpe **> &u, Kokkos::View<tpe **> &uNew, size_t nx, size_t ny) {
     Kokkos::parallel_for(                                                                                   //
         Kokkos::MDRangePolicy<Kokkos::Rank<2>, Kokkos::Schedule<Kokkos::Static>>({1, 1}, {nx - 1, ny - 1}), //
         KOKKOS_LAMBDA(const size_t i0, const size_t i1) {                                                   //
@@ -36,7 +36,7 @@ inline int realMain(int argc, char *argv[]) {
 
         // warm-up
         for (size_t i = 0; i < nItWarmUp; ++i) {
-            stencil2d(u, uNew, nx, ny);
+            stencil2D(u, uNew, nx, ny);
             std::swap(u, uNew);
         }
         Kokkos::fence();
@@ -45,7 +45,7 @@ inline int realMain(int argc, char *argv[]) {
         auto start = std::chrono::steady_clock::now();
 
         for (size_t i = 0; i < nIt; ++i) {
-            stencil2d(u, uNew, nx, ny);
+            stencil2D(u, uNew, nx, ny);
             std::swap(u, uNew);
         }
         Kokkos::fence();

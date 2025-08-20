@@ -20,7 +20,7 @@ inline int realMain(int argc, char *argv[]) {
     data = new tpe[nx];
 
     // init
-    initInit(data, nx);
+    initInit<tpe>(data, nx);
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
@@ -39,7 +39,7 @@ inline int realMain(int argc, char *argv[]) {
     printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe), 0);
 
     // check solution
-    checkSolutionInit(data, nx, nIt + nItWarmUp);
+    checkSolutionInit<tpe>(data, nx, nIt + nItWarmUp);
 
     delete[] data;
 

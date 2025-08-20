@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-__global__ void stream(const tpe *const __restrict__ src, tpe *__restrict__ dest, size_t nx) {
+__global__ void stream(const tpe *__restrict__ src, tpe *__restrict__ dest, size_t nx) {
     const size_t i0 = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (i0 < nx) {
@@ -30,7 +30,7 @@ inline int realMain(int argc, char *argv[]) {
     checkCudaError(cudaMalloc((void **)&d_src, sizeof(tpe) * nx));
 
     // init
-    initStream(dest, src, nx);
+    initStream<tpe>(dest, src, nx);
 
     checkCudaError(cudaMemcpy(d_dest, dest, sizeof(tpe) * nx, cudaMemcpyHostToDevice));
     checkCudaError(cudaMemcpy(d_src, src, sizeof(tpe) * nx, cudaMemcpyHostToDevice));
@@ -59,7 +59,7 @@ inline int realMain(int argc, char *argv[]) {
     checkCudaError(cudaMemcpy(src, d_src, sizeof(tpe) * nx, cudaMemcpyDeviceToHost));
 
     // check solution
-    checkSolutionStream(dest, src, nx, nIt + nItWarmUp);
+    checkSolutionStream<tpe>(dest, src, nx, nIt + nItWarmUp);
 
     checkCudaError(cudaFree(d_dest));
     checkCudaError(cudaFree(d_src));

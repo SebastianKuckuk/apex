@@ -1,11 +1,13 @@
 #include "square-root-util.h"
 
 
+#ifndef __NVCOMPILER
 #pragma omp requires unified_shared_memory
+#endif
 
 
 template <typename tpe>
-inline void squareroot(const tpe *const __restrict__ src, tpe *__restrict__ dest, size_t nx) {
+inline void squareRoot(const tpe *__restrict__ src, tpe *__restrict__ dest, size_t nx) {
 #pragma omp target teams distribute parallel for
     for (size_t i0 = 0; i0 < nx; ++i0) {
         tpe acc = src[i0];
@@ -30,11 +32,11 @@ inline int realMain(int argc, char *argv[]) {
     src = new tpe[nx];
 
     // init
-    initSquareRoot(dest, src, nx);
+    initSquareRoot<tpe>(dest, src, nx);
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        squareroot(src, dest, nx);
+        squareRoot(src, dest, nx);
         std::swap(src, dest);
     }
 
@@ -42,7 +44,7 @@ inline int realMain(int argc, char *argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        squareroot(src, dest, nx);
+        squareRoot(src, dest, nx);
         std::swap(src, dest);
     }
 
@@ -51,7 +53,7 @@ inline int realMain(int argc, char *argv[]) {
     printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe) + sizeof(tpe), 65536);
 
     // check solution
-    checkSolutionSquareRoot(dest, src, nx, nIt + nItWarmUp);
+    checkSolutionSquareRoot<tpe>(dest, src, nx, nIt + nItWarmUp);
 
     delete[] dest;
     delete[] src;

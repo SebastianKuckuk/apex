@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-__global__ void stencil2d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, size_t nx, size_t ny) {
+__global__ void stencil2D(const tpe *__restrict__ u, tpe *__restrict__ uNew, size_t nx, size_t ny) {
     const size_t i0 = blockIdx.x * blockDim.x + threadIdx.x;
     const size_t i1 = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -31,14 +31,14 @@ inline int realMain(int argc, char *argv[]) {
     checkCudaError(cudaMalloc((void **)&d_uNew, sizeof(tpe) * nx * ny));
 
     // init
-    initStencil2D(u, uNew, nx, ny);
+    initStencil2D<tpe>(u, uNew, nx, ny);
 
     checkCudaError(cudaMemcpy(d_u, u, sizeof(tpe) * nx * ny, cudaMemcpyHostToDevice));
     checkCudaError(cudaMemcpy(d_uNew, uNew, sizeof(tpe) * nx * ny, cudaMemcpyHostToDevice));
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        stencil2d<<<dim3(ceilingDivide(nx - 1, 16), ceilingDivide(ny - 1, 16)), dim3(16, 16)>>>(d_u, d_uNew, nx, ny);
+        stencil2D<<<dim3(ceilingDivide(nx - 1, 16), ceilingDivide(ny - 1, 16)), dim3(16, 16)>>>(d_u, d_uNew, nx, ny);
         std::swap(d_u, d_uNew);
     }
     checkCudaError(cudaDeviceSynchronize(), true);
@@ -47,7 +47,7 @@ inline int realMain(int argc, char *argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        stencil2d<<<dim3(ceilingDivide(nx - 1, 16), ceilingDivide(ny - 1, 16)), dim3(16, 16)>>>(d_u, d_uNew, nx, ny);
+        stencil2D<<<dim3(ceilingDivide(nx - 1, 16), ceilingDivide(ny - 1, 16)), dim3(16, 16)>>>(d_u, d_uNew, nx, ny);
         std::swap(d_u, d_uNew);
     }
     checkCudaError(cudaDeviceSynchronize(), true);
@@ -60,7 +60,7 @@ inline int realMain(int argc, char *argv[]) {
     checkCudaError(cudaMemcpy(uNew, d_uNew, sizeof(tpe) * nx * ny, cudaMemcpyDeviceToHost));
 
     // check solution
-    checkSolutionStencil2D(u, uNew, nx, ny, nIt + nItWarmUp);
+    checkSolutionStencil2D<tpe>(u, uNew, nx, ny, nIt + nItWarmUp);
 
     checkCudaError(cudaFree(d_u));
     checkCudaError(cudaFree(d_uNew));

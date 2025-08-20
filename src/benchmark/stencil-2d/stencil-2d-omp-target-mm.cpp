@@ -1,11 +1,13 @@
 #include "stencil-2d-util.h"
 
 
+#ifndef __NVCOMPILER
 #pragma omp requires unified_shared_memory
+#endif
 
 
 template <typename tpe>
-inline void stencil2d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, size_t nx, size_t ny) {
+inline void stencil2D(const tpe *__restrict__ u, tpe *__restrict__ uNew, size_t nx, size_t ny) {
 #pragma omp target teams distribute parallel for collapse(2)
     for (size_t i1 = 1; i1 < ny - 1; ++i1) {
         for (size_t i0 = 1; i0 < nx - 1; ++i0) {
@@ -27,11 +29,11 @@ inline int realMain(int argc, char *argv[]) {
     uNew = new tpe[nx * ny];
 
     // init
-    initStencil2D(u, uNew, nx, ny);
+    initStencil2D<tpe>(u, uNew, nx, ny);
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        stencil2d(u, uNew, nx, ny);
+        stencil2D(u, uNew, nx, ny);
         std::swap(u, uNew);
     }
 
@@ -39,7 +41,7 @@ inline int realMain(int argc, char *argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        stencil2d(u, uNew, nx, ny);
+        stencil2D(u, uNew, nx, ny);
         std::swap(u, uNew);
     }
 
@@ -48,7 +50,7 @@ inline int realMain(int argc, char *argv[]) {
     printStats<tpe>(end - start, nIt, nx * ny, tpeName, sizeof(tpe) + sizeof(tpe), 7);
 
     // check solution
-    checkSolutionStencil2D(u, uNew, nx, ny, nIt + nItWarmUp);
+    checkSolutionStencil2D<tpe>(u, uNew, nx, ny, nIt + nItWarmUp);
 
     delete[] u;
     delete[] uNew;

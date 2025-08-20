@@ -44,7 +44,7 @@ inline int realMain(int argc, char *argv[]) {
     data = new tpe[nx];
 
     // init
-    initFma(data, nx);
+    initFma<tpe>(data, nx);
 
     {
         sycl::buffer b_data(data, sycl::range(nx));
@@ -69,7 +69,7 @@ inline int realMain(int argc, char *argv[]) {
     } // implicit D-H copy of destroyed buffers
 
     // check solution
-    checkSolutionFma(data, nx, nIt + nItWarmUp);
+    checkSolutionFma<tpe>(data, nx, nIt + nItWarmUp);
 
     delete[] data;
 

@@ -5,7 +5,7 @@
 
 
 template <typename tpe>
-inline void stencil3d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, size_t nx, size_t ny, size_t nz) {
+inline void stencil3D(const tpe *__restrict__ u, tpe *__restrict__ uNew, size_t nx, size_t ny, size_t nz) {
     std::for_each(std::execution::par_unseq, u, u + nx * ny * nz, //
                   [=](const tpe &u_item) {                        //
                       const size_t idx = &u_item - u;
@@ -30,11 +30,11 @@ inline int realMain(int argc, char *argv[]) {
     uNew = new tpe[nx * ny * nz];
 
     // init
-    initStencil3D(u, uNew, nx, ny, nz);
+    initStencil3D<tpe>(u, uNew, nx, ny, nz);
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        stencil3d(u, uNew, nx, ny, nz);
+        stencil3D(u, uNew, nx, ny, nz);
         std::swap(u, uNew);
     }
 
@@ -42,7 +42,7 @@ inline int realMain(int argc, char *argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        stencil3d(u, uNew, nx, ny, nz);
+        stencil3D(u, uNew, nx, ny, nz);
         std::swap(u, uNew);
     }
 
@@ -51,7 +51,7 @@ inline int realMain(int argc, char *argv[]) {
     printStats<tpe>(end - start, nIt, nx * ny * nz, tpeName, sizeof(tpe) + sizeof(tpe), 11);
 
     // check solution
-    checkSolutionStencil3D(u, uNew, nx, ny, nz, nIt + nItWarmUp);
+    checkSolutionStencil3D<tpe>(u, uNew, nx, ny, nz, nIt + nItWarmUp);
 
     delete[] u;
     delete[] uNew;

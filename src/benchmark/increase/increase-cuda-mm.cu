@@ -23,7 +23,7 @@ inline int realMain(int argc, char *argv[]) {
     checkCudaError(cudaMallocManaged((void **)&data, sizeof(tpe) * nx));
 
     // init
-    initIncrease(data, nx);
+    initIncrease<tpe>(data, nx);
 
     checkCudaError(cudaMemPrefetchAsync(data, sizeof(tpe) * nx, 0));
 
@@ -48,7 +48,7 @@ inline int realMain(int argc, char *argv[]) {
     checkCudaError(cudaMemPrefetchAsync(data, sizeof(tpe) * nx, cudaCpuDeviceId));
 
     // check solution
-    checkSolutionIncrease(data, nx, nIt + nItWarmUp);
+    checkSolutionIncrease<tpe>(data, nx, nIt + nItWarmUp);
 
     checkCudaError(cudaFree(data));
 

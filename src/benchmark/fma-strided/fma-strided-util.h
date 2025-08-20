@@ -11,7 +11,7 @@ inline void initFmaStrided(tpe *__restrict__ data, size_t nx, size_t stride) {
 }
 
 template <typename tpe>
-inline void checkSolutionFmaStrided(const tpe *const __restrict__ data, size_t nx, size_t nIt, size_t stride) {
+inline void checkSolutionFmaStrided(const tpe *__restrict__ data, size_t nx, size_t nIt, size_t stride) {
     for (size_t i0 = 0; i0 < nx * stride; ++i0) {
         if ((tpe)((tpe)1) != data[i0]) {
             std::cerr << "FmaStrided check failed for element " << i0 << " (expected " << (tpe)1 << " but got " << data[i0] << ")" << std::endl;

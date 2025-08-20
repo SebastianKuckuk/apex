@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-__global__ void streamstrided(const tpe *const __restrict__ src, tpe *__restrict__ dest, size_t nx, size_t strideRead, size_t strideWrite) {
+__global__ void streamStrided(const tpe *__restrict__ src, tpe *__restrict__ dest, size_t nx, size_t strideRead, size_t strideWrite) {
     const size_t i0 = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (i0 < nx) {
@@ -32,14 +32,14 @@ inline int realMain(int argc, char *argv[]) {
     checkCudaError(cudaMalloc((void **)&d_src, sizeof(tpe) * nx * std::max(strideRead, strideWrite)));
 
     // init
-    initStreamStrided(dest, src, nx, strideRead, strideWrite);
+    initStreamStrided<tpe>(dest, src, nx, strideRead, strideWrite);
 
     checkCudaError(cudaMemcpy(d_dest, dest, sizeof(tpe) * nx * std::max(strideRead, strideWrite), cudaMemcpyHostToDevice));
     checkCudaError(cudaMemcpy(d_src, src, sizeof(tpe) * nx * std::max(strideRead, strideWrite), cudaMemcpyHostToDevice));
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        streamstrided<<<ceilingDivide(nx, 256), 256>>>(d_src, d_dest, nx, strideRead, strideWrite);
+        streamStrided<<<ceilingDivide(nx, 256), 256>>>(d_src, d_dest, nx, strideRead, strideWrite);
         std::swap(d_src, d_dest);
     }
     checkCudaError(cudaDeviceSynchronize(), true);
@@ -48,7 +48,7 @@ inline int realMain(int argc, char *argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        streamstrided<<<ceilingDivide(nx, 256), 256>>>(d_src, d_dest, nx, strideRead, strideWrite);
+        streamStrided<<<ceilingDivide(nx, 256), 256>>>(d_src, d_dest, nx, strideRead, strideWrite);
         std::swap(d_src, d_dest);
     }
     checkCudaError(cudaDeviceSynchronize(), true);
@@ -61,7 +61,7 @@ inline int realMain(int argc, char *argv[]) {
     checkCudaError(cudaMemcpy(src, d_src, sizeof(tpe) * nx * std::max(strideRead, strideWrite), cudaMemcpyDeviceToHost));
 
     // check solution
-    checkSolutionStreamStrided(dest, src, nx, nIt + nItWarmUp, strideRead, strideWrite);
+    checkSolutionStreamStrided<tpe>(dest, src, nx, nIt + nItWarmUp, strideRead, strideWrite);
 
     checkCudaError(cudaFree(d_dest));
     checkCudaError(cudaFree(d_src));

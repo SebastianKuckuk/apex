@@ -11,7 +11,7 @@ inline void initFma(tpe *__restrict__ data, size_t nx) {
 }
 
 template <typename tpe>
-inline void checkSolutionFma(const tpe *const __restrict__ data, size_t nx, size_t nIt) {
+inline void checkSolutionFma(const tpe *__restrict__ data, size_t nx, size_t nIt) {
     for (size_t i0 = 0; i0 < nx; ++i0) {
         if ((tpe)((tpe)1) != data[i0]) {
             std::cerr << "Fma check failed for element " << i0 << " (expected " << (tpe)1 << " but got " << data[i0] << ")" << std::endl;

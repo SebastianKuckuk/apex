@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-inline void stencil1d(sycl::queue &q, const tpe *const __restrict__ u, tpe *__restrict__ uNew, size_t nx) {
+inline void stencil1D(sycl::queue &q, const tpe *__restrict__ u, tpe *__restrict__ uNew, size_t nx) {
     q.submit([&](sycl::handler &h) {
         h.parallel_for(nx - 1, [=](auto i0) {
             if (i0 >= 1 && i0 < nx - 1) {
@@ -29,11 +29,11 @@ inline int realMain(int argc, char *argv[]) {
     uNew = sycl::malloc_shared<tpe>(nx, q);
 
     // init
-    initStencil1D(u, uNew, nx);
+    initStencil1D<tpe>(u, uNew, nx);
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        stencil1d(q, u, uNew, nx);
+        stencil1D(q, u, uNew, nx);
         std::swap(u, uNew);
     }
     q.wait();
@@ -42,7 +42,7 @@ inline int realMain(int argc, char *argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        stencil1d(q, u, uNew, nx);
+        stencil1D(q, u, uNew, nx);
         std::swap(u, uNew);
     }
     q.wait();
@@ -52,7 +52,7 @@ inline int realMain(int argc, char *argv[]) {
     printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe) + sizeof(tpe), 3);
 
     // check solution
-    checkSolutionStencil1D(u, uNew, nx, nIt + nItWarmUp);
+    checkSolutionStencil1D<tpe>(u, uNew, nx, nIt + nItWarmUp);
 
     sycl::free(u, q);
     sycl::free(uNew, q);

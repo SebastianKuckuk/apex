@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-inline void streamstrided(const Kokkos::View<tpe *> &src, Kokkos::View<tpe *> &dest, size_t nx, size_t strideRead, size_t strideWrite) {
+inline void streamStrided(const Kokkos::View<tpe *> &src, Kokkos::View<tpe *> &dest, size_t nx, size_t strideRead, size_t strideWrite) {
     Kokkos::parallel_for(                //
         Kokkos::RangePolicy<>(0, nx),    //
         KOKKOS_LAMBDA(const size_t i0) { //
@@ -38,7 +38,7 @@ inline int realMain(int argc, char *argv[]) {
 
         // warm-up
         for (size_t i = 0; i < nItWarmUp; ++i) {
-            streamstrided(src, dest, nx, strideRead, strideWrite);
+            streamStrided(src, dest, nx, strideRead, strideWrite);
             std::swap(src, dest);
         }
         Kokkos::fence();
@@ -47,7 +47,7 @@ inline int realMain(int argc, char *argv[]) {
         auto start = std::chrono::steady_clock::now();
 
         for (size_t i = 0; i < nIt; ++i) {
-            streamstrided(src, dest, nx, strideRead, strideWrite);
+            streamStrided(src, dest, nx, strideRead, strideWrite);
             std::swap(src, dest);
         }
         Kokkos::fence();

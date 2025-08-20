@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-inline void stream(sycl::queue &q, const tpe *const __restrict__ src, tpe *__restrict__ dest, size_t nx) {
+inline void stream(sycl::queue &q, const tpe *__restrict__ src, tpe *__restrict__ dest, size_t nx) {
     q.submit([&](sycl::handler &h) {
         h.parallel_for(nx, [=](auto i0) {
             if (i0 < nx) {
@@ -34,7 +34,7 @@ inline int realMain(int argc, char *argv[]) {
     d_src = sycl::malloc_device<tpe>(nx, q);
 
     // init
-    initStream(dest, src, nx);
+    initStream<tpe>(dest, src, nx);
 
     q.memcpy(d_dest, dest, sizeof(tpe) * nx);
     q.wait();
@@ -67,7 +67,7 @@ inline int realMain(int argc, char *argv[]) {
     q.wait();
 
     // check solution
-    checkSolutionStream(dest, src, nx, nIt + nItWarmUp);
+    checkSolutionStream<tpe>(dest, src, nx, nIt + nItWarmUp);
 
     sycl::free(d_dest, q);
     sycl::free(d_src, q);

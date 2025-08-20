@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-__global__ void fmastrided(tpe *__restrict__ data, size_t nx, size_t stride) {
+__global__ void fmaStrided(tpe *__restrict__ data, size_t nx, size_t stride) {
     const size_t i0 = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (i0 < nx * stride) {
@@ -42,13 +42,13 @@ inline int realMain(int argc, char *argv[]) {
     checkCudaError(cudaMallocManaged((void **)&data, sizeof(tpe) * nx * stride));
 
     // init
-    initFmaStrided(data, nx, stride);
+    initFmaStrided<tpe>(data, nx, stride);
 
     checkCudaError(cudaMemPrefetchAsync(data, sizeof(tpe) * nx * stride, 0));
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        fmastrided<<<ceilingDivide(nx * stride, 256), 256>>>(data, nx, stride);
+        fmaStrided<<<ceilingDivide(nx * stride, 256), 256>>>(data, nx, stride);
     }
     checkCudaError(cudaDeviceSynchronize(), true);
 
@@ -56,7 +56,7 @@ inline int realMain(int argc, char *argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        fmastrided<<<ceilingDivide(nx * stride, 256), 256>>>(data, nx, stride);
+        fmaStrided<<<ceilingDivide(nx * stride, 256), 256>>>(data, nx, stride);
     }
     checkCudaError(cudaDeviceSynchronize(), true);
 
@@ -67,7 +67,7 @@ inline int realMain(int argc, char *argv[]) {
     checkCudaError(cudaMemPrefetchAsync(data, sizeof(tpe) * nx * stride, cudaCpuDeviceId));
 
     // check solution
-    checkSolutionFmaStrided(data, nx, nIt + nItWarmUp, stride);
+    checkSolutionFmaStrided<tpe>(data, nx, nIt + nItWarmUp, stride);
 
     checkCudaError(cudaFree(data));
 

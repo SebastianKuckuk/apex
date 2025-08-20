@@ -6,8 +6,8 @@
 template <typename tpe>
 inline void stream(sycl::queue &q, sycl::buffer<tpe> &b_src, sycl::buffer<tpe> &b_dest, size_t nx) {
     q.submit([&](sycl::handler &h) {
-        auto src = b_src.get_access(h, sycl::read_only);
         auto dest = b_dest.get_access(h, sycl::write_only);
+        auto src = b_src.get_access(h, sycl::read_only);
 
         h.parallel_for(nx, [=](auto i0) {
             if (i0 < nx) {
@@ -32,7 +32,7 @@ inline int realMain(int argc, char *argv[]) {
     src = new tpe[nx];
 
     // init
-    initStream(dest, src, nx);
+    initStream<tpe>(dest, src, nx);
 
     {
         sycl::buffer b_dest(dest, sycl::range(nx));
@@ -60,7 +60,7 @@ inline int realMain(int argc, char *argv[]) {
     } // implicit D-H copy of destroyed buffers
 
     // check solution
-    checkSolutionStream(dest, src, nx, nIt + nItWarmUp);
+    checkSolutionStream<tpe>(dest, src, nx, nIt + nItWarmUp);
 
     delete[] dest;
     delete[] src;

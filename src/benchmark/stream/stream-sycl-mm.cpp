@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-inline void stream(sycl::queue &q, const tpe *const __restrict__ src, tpe *__restrict__ dest, size_t nx) {
+inline void stream(sycl::queue &q, const tpe *__restrict__ src, tpe *__restrict__ dest, size_t nx) {
     q.submit([&](sycl::handler &h) {
         h.parallel_for(nx, [=](auto i0) {
             if (i0 < nx) {
@@ -29,7 +29,7 @@ inline int realMain(int argc, char *argv[]) {
     src = sycl::malloc_shared<tpe>(nx, q);
 
     // init
-    initStream(dest, src, nx);
+    initStream<tpe>(dest, src, nx);
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
@@ -52,7 +52,7 @@ inline int realMain(int argc, char *argv[]) {
     printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe) + sizeof(tpe), 1);
 
     // check solution
-    checkSolutionStream(dest, src, nx, nIt + nItWarmUp);
+    checkSolutionStream<tpe>(dest, src, nx, nIt + nItWarmUp);
 
     sycl::free(dest, q);
     sycl::free(src, q);

@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-inline void fmastrided(sycl::queue &q, tpe *__restrict__ data, size_t nx, size_t stride) {
+inline void fmaStrided(sycl::queue &q, tpe *__restrict__ data, size_t nx, size_t stride) {
     q.submit([&](sycl::handler &h) {
         h.parallel_for(nx * stride, [=](auto i0) {
             if (i0 < nx * stride) {
@@ -46,11 +46,11 @@ inline int realMain(int argc, char *argv[]) {
     data = sycl::malloc_shared<tpe>(nx * stride, q);
 
     // init
-    initFmaStrided(data, nx, stride);
+    initFmaStrided<tpe>(data, nx, stride);
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        fmastrided(q, data, nx, stride);
+        fmaStrided(q, data, nx, stride);
     }
     q.wait();
 
@@ -58,7 +58,7 @@ inline int realMain(int argc, char *argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        fmastrided(q, data, nx, stride);
+        fmaStrided(q, data, nx, stride);
     }
     q.wait();
 
@@ -67,7 +67,7 @@ inline int realMain(int argc, char *argv[]) {
     printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe), 131072);
 
     // check solution
-    checkSolutionFmaStrided(data, nx, nIt + nItWarmUp, stride);
+    checkSolutionFmaStrided<tpe>(data, nx, nIt + nItWarmUp, stride);
 
     sycl::free(data, q);
 

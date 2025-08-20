@@ -3,7 +3,7 @@
 
 template <typename tpe>
 inline void fma(tpe *__restrict__ data, size_t nx) {
-#pragma acc parallel loop present(data[0 : nx])
+#pragma acc parallel loop present(data [0:nx])
     for (size_t i0 = 0; i0 < nx; ++i0) {
         tpe a = (tpe)0.5, b = (tpe)1;
         // dummy op to prevent compiler from solving loop analytically
@@ -35,7 +35,7 @@ inline int realMain(int argc, char *argv[]) {
     data = new tpe[nx];
 
     // init
-    initFma(data, nx);
+    initFma<tpe>(data, nx);
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
@@ -54,7 +54,7 @@ inline int realMain(int argc, char *argv[]) {
     printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe), 131072);
 
     // check solution
-    checkSolutionFma(data, nx, nIt + nItWarmUp);
+    checkSolutionFma<tpe>(data, nx, nIt + nItWarmUp);
 
     delete[] data;
 

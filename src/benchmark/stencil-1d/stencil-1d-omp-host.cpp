@@ -2,7 +2,7 @@
 
 
 template <typename tpe>
-inline void stencil1d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, size_t nx) {
+inline void stencil1D(const tpe *__restrict__ u, tpe *__restrict__ uNew, size_t nx) {
 #pragma omp parallel for schedule(static)
     for (size_t i0 = 1; i0 < nx - 1; ++i0) {
         uNew[i0] = 0.5 * u[i0 + 1] + 0.5 * u[i0 - 1];
@@ -22,11 +22,11 @@ inline int realMain(int argc, char *argv[]) {
     uNew = new tpe[nx];
 
     // init
-    initStencil1D(u, uNew, nx);
+    initStencil1D<tpe>(u, uNew, nx);
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        stencil1d(u, uNew, nx);
+        stencil1D(u, uNew, nx);
         std::swap(u, uNew);
     }
 
@@ -34,7 +34,7 @@ inline int realMain(int argc, char *argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        stencil1d(u, uNew, nx);
+        stencil1D(u, uNew, nx);
         std::swap(u, uNew);
     }
 
@@ -43,7 +43,7 @@ inline int realMain(int argc, char *argv[]) {
     printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe) + sizeof(tpe), 3);
 
     // check solution
-    checkSolutionStencil1D(u, uNew, nx, nIt + nItWarmUp);
+    checkSolutionStencil1D<tpe>(u, uNew, nx, nIt + nItWarmUp);
 
     delete[] u;
     delete[] uNew;

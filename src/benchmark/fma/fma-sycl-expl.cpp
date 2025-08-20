@@ -45,7 +45,7 @@ inline int realMain(int argc, char *argv[]) {
     d_data = sycl::malloc_device<tpe>(nx, q);
 
     // init
-    initFma(data, nx);
+    initFma<tpe>(data, nx);
 
     q.memcpy(d_data, data, sizeof(tpe) * nx);
     q.wait();
@@ -72,7 +72,7 @@ inline int realMain(int argc, char *argv[]) {
     q.wait();
 
     // check solution
-    checkSolutionFma(data, nx, nIt + nItWarmUp);
+    checkSolutionFma<tpe>(data, nx, nIt + nItWarmUp);
 
     sycl::free(d_data, q);
 

@@ -12,7 +12,7 @@ inline void initSquareRoot(tpe *__restrict__ dest, tpe *__restrict__ src, size_t
 }
 
 template <typename tpe>
-inline void checkSolutionSquareRoot(const tpe *const __restrict__ dest, const tpe *const __restrict__ src, size_t nx, size_t nIt) {
+inline void checkSolutionSquareRoot(const tpe *__restrict__ dest, const tpe *__restrict__ src, size_t nx, size_t nIt) {
     for (size_t i0 = 0; i0 < nx; ++i0) {
         if ((tpe)((tpe)1) != src[i0]) {
             std::cerr << "SquareRoot check failed for element " << i0 << " (expected " << (tpe)1 << " but got " << src[i0] << ")" << std::endl;

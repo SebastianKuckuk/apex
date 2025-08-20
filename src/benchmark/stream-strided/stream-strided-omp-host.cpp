@@ -2,7 +2,7 @@
 
 
 template <typename tpe>
-inline void streamstrided(const tpe *const __restrict__ src, tpe *__restrict__ dest, size_t nx, size_t strideRead, size_t strideWrite) {
+inline void streamStrided(const tpe *__restrict__ src, tpe *__restrict__ dest, size_t nx, size_t strideRead, size_t strideWrite) {
 #pragma omp parallel for schedule(static)
     for (size_t i0 = 0; i0 < nx; ++i0) {
         dest[i0 * strideWrite] = src[i0 * strideRead] + 1;
@@ -24,11 +24,11 @@ inline int realMain(int argc, char *argv[]) {
     src = new tpe[nx * std::max(strideRead, strideWrite)];
 
     // init
-    initStreamStrided(dest, src, nx, strideRead, strideWrite);
+    initStreamStrided<tpe>(dest, src, nx, strideRead, strideWrite);
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        streamstrided(src, dest, nx, strideRead, strideWrite);
+        streamStrided(src, dest, nx, strideRead, strideWrite);
         std::swap(src, dest);
     }
 
@@ -36,7 +36,7 @@ inline int realMain(int argc, char *argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        streamstrided(src, dest, nx, strideRead, strideWrite);
+        streamStrided(src, dest, nx, strideRead, strideWrite);
         std::swap(src, dest);
     }
 
@@ -45,7 +45,7 @@ inline int realMain(int argc, char *argv[]) {
     printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe) + sizeof(tpe), 1);
 
     // check solution
-    checkSolutionStreamStrided(dest, src, nx, nIt + nItWarmUp, strideRead, strideWrite);
+    checkSolutionStreamStrided<tpe>(dest, src, nx, nIt + nItWarmUp, strideRead, strideWrite);
 
     delete[] dest;
     delete[] src;

@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-__global__ void stream(const tpe *const __restrict__ src, tpe *__restrict__ dest, size_t nx) {
+__global__ void stream(const tpe *__restrict__ src, tpe *__restrict__ dest, size_t nx) {
     const size_t i0 = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (i0 < nx) {
@@ -25,7 +25,7 @@ inline int realMain(int argc, char *argv[]) {
     checkCudaError(cudaMallocManaged((void **)&src, sizeof(tpe) * nx));
 
     // init
-    initStream(dest, src, nx);
+    initStream<tpe>(dest, src, nx);
 
     checkCudaError(cudaMemPrefetchAsync(dest, sizeof(tpe) * nx, 0));
     checkCudaError(cudaMemPrefetchAsync(src, sizeof(tpe) * nx, 0));
@@ -54,7 +54,7 @@ inline int realMain(int argc, char *argv[]) {
     checkCudaError(cudaMemPrefetchAsync(src, sizeof(tpe) * nx, cudaCpuDeviceId));
 
     // check solution
-    checkSolutionStream(dest, src, nx, nIt + nItWarmUp);
+    checkSolutionStream<tpe>(dest, src, nx, nIt + nItWarmUp);
 
     checkCudaError(cudaFree(dest));
     checkCudaError(cudaFree(src));

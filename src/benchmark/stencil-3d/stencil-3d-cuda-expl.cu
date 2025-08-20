@@ -4,7 +4,7 @@
 
 
 template <typename tpe>
-__global__ void stencil3d(const tpe *const __restrict__ u, tpe *__restrict__ uNew, size_t nx, size_t ny, size_t nz) {
+__global__ void stencil3D(const tpe *__restrict__ u, tpe *__restrict__ uNew, size_t nx, size_t ny, size_t nz) {
     const size_t i0 = blockIdx.x * blockDim.x + threadIdx.x;
     const size_t i1 = blockIdx.y * blockDim.y + threadIdx.y;
     const size_t i2 = blockIdx.z * blockDim.z + threadIdx.z;
@@ -32,14 +32,14 @@ inline int realMain(int argc, char *argv[]) {
     checkCudaError(cudaMalloc((void **)&d_uNew, sizeof(tpe) * nx * ny * nz));
 
     // init
-    initStencil3D(u, uNew, nx, ny, nz);
+    initStencil3D<tpe>(u, uNew, nx, ny, nz);
 
     checkCudaError(cudaMemcpy(d_u, u, sizeof(tpe) * nx * ny * nz, cudaMemcpyHostToDevice));
     checkCudaError(cudaMemcpy(d_uNew, uNew, sizeof(tpe) * nx * ny * nz, cudaMemcpyHostToDevice));
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        stencil3d<<<dim3(ceilingDivide(nx - 1, 16), ceilingDivide(ny - 1, 4), ceilingDivide(nz - 1, 4)), dim3(16, 4, 4)>>>(d_u, d_uNew, nx, ny, nz);
+        stencil3D<<<dim3(ceilingDivide(nx - 1, 16), ceilingDivide(ny - 1, 4), ceilingDivide(nz - 1, 4)), dim3(16, 4, 4)>>>(d_u, d_uNew, nx, ny, nz);
         std::swap(d_u, d_uNew);
     }
     checkCudaError(cudaDeviceSynchronize(), true);
@@ -48,7 +48,7 @@ inline int realMain(int argc, char *argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        stencil3d<<<dim3(ceilingDivide(nx - 1, 16), ceilingDivide(ny - 1, 4), ceilingDivide(nz - 1, 4)), dim3(16, 4, 4)>>>(d_u, d_uNew, nx, ny, nz);
+        stencil3D<<<dim3(ceilingDivide(nx - 1, 16), ceilingDivide(ny - 1, 4), ceilingDivide(nz - 1, 4)), dim3(16, 4, 4)>>>(d_u, d_uNew, nx, ny, nz);
         std::swap(d_u, d_uNew);
     }
     checkCudaError(cudaDeviceSynchronize(), true);
@@ -61,7 +61,7 @@ inline int realMain(int argc, char *argv[]) {
     checkCudaError(cudaMemcpy(uNew, d_uNew, sizeof(tpe) * nx * ny * nz, cudaMemcpyDeviceToHost));
 
     // check solution
-    checkSolutionStencil3D(u, uNew, nx, ny, nz, nIt + nItWarmUp);
+    checkSolutionStencil3D<tpe>(u, uNew, nx, ny, nz, nIt + nItWarmUp);
 
     checkCudaError(cudaFree(d_u));
     checkCudaError(cudaFree(d_uNew));

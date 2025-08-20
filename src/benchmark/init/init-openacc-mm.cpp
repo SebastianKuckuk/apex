@@ -3,7 +3,7 @@
 
 template <typename tpe>
 inline void init(tpe *__restrict__ data, size_t nx) {
-#pragma acc parallel loop present(data[0 : nx])
+#pragma acc parallel loop present(data [0:nx])
     for (size_t i0 = 0; i0 < nx; ++i0) {
         data[i0] = i0;
     }
@@ -20,7 +20,7 @@ inline int realMain(int argc, char *argv[]) {
     data = new tpe[nx];
 
     // init
-    initInit(data, nx);
+    initInit<tpe>(data, nx);
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
@@ -39,7 +39,7 @@ inline int realMain(int argc, char *argv[]) {
     printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe), 0);
 
     // check solution
-    checkSolutionInit(data, nx, nIt + nItWarmUp);
+    checkSolutionInit<tpe>(data, nx, nIt + nItWarmUp);
 
     delete[] data;
 

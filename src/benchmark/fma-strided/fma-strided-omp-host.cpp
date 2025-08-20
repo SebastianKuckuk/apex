@@ -2,7 +2,7 @@
 
 
 template <typename tpe>
-inline void fmastrided(tpe *__restrict__ data, size_t nx, size_t stride) {
+inline void fmaStrided(tpe *__restrict__ data, size_t nx, size_t stride) {
 #pragma omp parallel for schedule(static)
     for (size_t i0 = 0; i0 < nx * stride; ++i0) {
         tpe a = (tpe)0.5, b = (tpe)1;
@@ -39,18 +39,18 @@ inline int realMain(int argc, char *argv[]) {
     data = new tpe[nx * stride];
 
     // init
-    initFmaStrided(data, nx, stride);
+    initFmaStrided<tpe>(data, nx, stride);
 
     // warm-up
     for (size_t i = 0; i < nItWarmUp; ++i) {
-        fmastrided(data, nx, stride);
+        fmaStrided(data, nx, stride);
     }
 
     // measurement
     auto start = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i < nIt; ++i) {
-        fmastrided(data, nx, stride);
+        fmaStrided(data, nx, stride);
     }
 
     auto end = std::chrono::steady_clock::now();
@@ -58,7 +58,7 @@ inline int realMain(int argc, char *argv[]) {
     printStats<tpe>(end - start, nIt, nx, tpeName, sizeof(tpe), 131072);
 
     // check solution
-    checkSolutionFmaStrided(data, nx, nIt + nItWarmUp, stride);
+    checkSolutionFmaStrided<tpe>(data, nx, nIt + nItWarmUp, stride);
 
     delete[] data;
 
