@@ -3,11 +3,29 @@
 
 template <typename tpe>
 inline void dmvp(long long nx, const tpe *const __restrict__ mat, const tpe *const __restrict__ src, tpe *__restrict__ dest) {
-    #pragma omp target teams distribute parallel for
-    for (int row = 0; row < nx; ++row) {
-        dest[row] = 0.;
-        for (int col = 0; col < nx; ++col)
-            dest[row] += mat[row * nx + col] * src[col];
+    #pragma omp target teams distribute
+    for (int row = 0; row < nx; row += 4) {
+        tpe acc0 = (tpe)0;
+        tpe acc1 = (tpe)0;
+        tpe acc2 = (tpe)0;
+        tpe acc3 = (tpe)0;
+        #pragma omp parallel for reduction(+ : acc0, acc1, acc2, acc3)
+        for (int col = 0; col < nx; ++col) {
+            acc0 += mat[row * nx + col] * src[col];
+            if (row + 1 < nx)
+                acc1 += mat[(row + 1) * nx + col] * src[col];
+            if (row + 2 < nx)
+                acc2 += mat[(row + 2) * nx + col] * src[col];
+            if (row + 3 < nx)
+                acc3 += mat[(row + 3) * nx + col] * src[col];
+        }
+        dest[row] = acc0;
+        if (row + 1 < nx)
+            dest[row + 1] = acc1;
+        if (row + 2 < nx)
+            dest[row + 2] = acc2;
+        if (row + 3 < nx)
+            dest[row + 3] = acc3;
     }
 }
 

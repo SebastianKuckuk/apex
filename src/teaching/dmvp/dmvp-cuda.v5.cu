@@ -3,29 +3,29 @@
 
 
 template <typename tpe>
-__global__ void dmvp(size_t nx, const tpe *const __restrict__ mat, const tpe *const __restrict__ src, tpe *__restrict__ dest) {
-    auto cStart = blockIdx.x * blockDim.x + threadIdx.x;
-    auto cStride = gridDim.x * blockDim.x;
-    auto rStart = blockIdx.y * blockDim.y + threadIdx.y;
-    auto rStride = gridDim.y * blockDim.y;
+__global__ void dmvp(long long nx, const tpe *const __restrict__ mat, const tpe *const __restrict__ src, tpe *__restrict__ dest) {
+    int colStart = blockIdx.x * blockDim.x + threadIdx.x;
+    int colStride = gridDim.x * blockDim.x;
+    int rowStart = blockIdx.y * blockDim.y + threadIdx.y;
+    int rowStride = gridDim.y * blockDim.y;
 
     __shared__ double out[32];
 
-    for (size_t r = rStart; r < nx; r += rStride) {
+    for (int row = rowStart; row < nx; row += rowStride) {
         if (threadIdx.x < 32 && 0 == threadIdx.y)
             out[threadIdx.x] = 0;
 
         __syncthreads();
 
-        auto acc = 0.;
-        for (size_t c = cStart; c < nx; c += cStride)
-            acc += mat[r * nx + c] * src[c];
+        tpe acc = (tpe)0;
+        for (int col = colStart; col < nx; col += colStride)
+            acc += mat[row * nx + col] * src[col];
         atomicAdd(&out[threadIdx.y], acc);
 
         __syncthreads();
 
         if (threadIdx.x < 32 && 0 == threadIdx.y)
-            atomicAdd(&dest[r + threadIdx.x], out[threadIdx.x]);
+            atomicAdd(&dest[row + threadIdx.x], out[threadIdx.x]);
 
         // __syncthreads();
     }
@@ -35,7 +35,8 @@ __global__ void dmvp(size_t nx, const tpe *const __restrict__ mat, const tpe *co
 template <typename tpe>
 inline int realMain(int argc, char *argv[]) {
     char *tpeName;
-    size_t nx, nItWarmUp, nIt;
+    long long nx;
+    int nItWarmUp, nIt;;
     parseCLA_1d(argc, argv, tpeName, nx, nItWarmUp, nIt);
 
     double *mat, *src, *dest;
@@ -59,7 +60,7 @@ inline int realMain(int argc, char *argv[]) {
     dim3 numBlocks(4, nx / blockSize.y);
 
     // warm-up
-    for (size_t i = 0; i < nItWarmUp; ++i) {
+    for (int i = 0; i < nItWarmUp; ++i) {
         cudaMemset(d_dest, 0, sizeof(double) * nx);
         dmvp<<<numBlocks, blockSize>>>(nx, d_mat, d_src, d_dest);
         std::swap(d_src, d_dest);
@@ -69,7 +70,7 @@ inline int realMain(int argc, char *argv[]) {
     // measurement
     auto start = std::chrono::steady_clock::now();
 
-    for (size_t i = 0; i < nIt; ++i) {
+    for (int i = 0; i < nIt; ++i) {
         cudaMemset(d_dest, 0, sizeof(double) * nx);
         dmvp<<<numBlocks, blockSize>>>(nx, d_mat, d_src, d_dest);
         std::swap(d_src, d_dest);

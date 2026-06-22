@@ -2,18 +2,18 @@
 
 
 template <typename tpe>
-void initDMVP(tpe *mat, tpe *vec, size_t nx) {
-    for (size_t r = 0; r < nx; ++r)
-        for (size_t c = 0; c < nx; ++c)
-            mat[r * nx + c] = 2. / nx;
+void initDMVP(tpe *mat, tpe *vec, long long nx) {
+    for (int row = 0; row < nx; ++row)
+        for (int col = 0; col < nx; ++col)
+            mat[row * nx + col] = 2. / nx;
 
-    for (size_t i = 0; i < nx; ++i)
+    for (int i = 0; i < nx; ++i)
         vec[i] = 1.;
 }
 
 template <typename tpe>
-void checkSolutionDMVP(const tpe *const vec, size_t nx, size_t nIt) {
-    for (size_t i = 0; i < nx; ++i)
+void checkSolutionDMVP(const tpe *const vec, long long nx, int nIt) {
+    for (int i = 0; i < nx; ++i)
         if ((tpe) (1 << nIt) != vec[i]) {
             std::cerr << "Mat-Vec-Mult check failed for element " << i << " (expected " << (1 << nIt) << " but got " << vec[i] << ")" << std::endl;
             return;
@@ -23,7 +23,7 @@ void checkSolutionDMVP(const tpe *const vec, size_t nx, size_t nIt) {
 }
 
 
-inline void parseCLA_1d(int argc, char **argv, char *&tpeName, size_t &nx, size_t &nItWarmUp, size_t &nIt) {
+inline void parseCLA_1d(int argc, char **argv, char *&tpeName, long long &nx, int &nItWarmUp, int &nIt) {
     // default values
     nx = 1024;
 
@@ -49,7 +49,7 @@ inline void parseCLA_1d(int argc, char **argv, char *&tpeName, size_t &nx, size_
 
 
 template<typename tpe>
-void printStatsDMVP(const std::chrono::duration<double> elapsedSeconds, size_t nIt, size_t nRows, char* tpeName, size_t numBytesPerRow, size_t numFlopsPerRow) {
+void printStatsDMVP(const std::chrono::duration<double> elapsedSeconds, int nIt, int nRows, char* tpeName, int numBytesPerRow, int numFlopsPerRow) {
     std::cout << "  #rows / #it:   " << nRows << " / " << nIt << "\n";
     std::cout << "  type:          " << tpeName << "\n";
     std::cout << "  elapsed time:  " << 1e3 * elapsedSeconds.count() << " ms\n";

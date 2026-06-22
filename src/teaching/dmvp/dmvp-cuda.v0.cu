@@ -3,14 +3,13 @@
 
 
 template <typename tpe>
-__global__ void dmvp(size_t nx, const tpe *const __restrict__ mat, const tpe *const __restrict__ src, tpe *__restrict__ dest) {
-    size_t r = blockIdx.x * blockDim.x + threadIdx.x;
+__global__ void dmvp(long long nx, const tpe *const __restrict__ mat, const tpe *const __restrict__ src, tpe *__restrict__ dest) {
+    int row = blockIdx.x * blockDim.x + threadIdx.x;
 
-    if (r < nx) {
-        dest[r] = 0.;
-        for (size_t c = 0; c < nx; ++c) {
-            dest[r] += mat[r * nx + c] * src[c];
-        }
+    if (row < nx) {
+        dest[row] = 0.;
+        for (int col = 0; col < nx; ++col)
+            dest[row] += mat[row * nx + col] * src[col];
     }
 }
 
@@ -18,7 +17,8 @@ __global__ void dmvp(size_t nx, const tpe *const __restrict__ mat, const tpe *co
 template <typename tpe>
 inline int realMain(int argc, char *argv[]) {
     char *tpeName;
-    size_t nx, nItWarmUp, nIt;
+    long long nx;
+    int nItWarmUp, nIt;;
     parseCLA_1d(argc, argv, tpeName, nx, nItWarmUp, nIt);
 
     double *mat, *src, *dest;
@@ -42,7 +42,7 @@ inline int realMain(int argc, char *argv[]) {
     dim3 numBlocks(ceilingDivide(nx, blockSize.x));
 
     // warm-up
-    for (size_t i = 0; i < nItWarmUp; ++i) {
+    for (int i = 0; i < nItWarmUp; ++i) {
         dmvp<<<numBlocks, blockSize>>>(nx, d_mat, d_src, d_dest);
         std::swap(d_src, d_dest);
     }
@@ -51,7 +51,7 @@ inline int realMain(int argc, char *argv[]) {
     // measurement
     auto start = std::chrono::steady_clock::now();
 
-    for (size_t i = 0; i < nIt; ++i) {
+    for (int i = 0; i < nIt; ++i) {
         dmvp<<<numBlocks, blockSize>>>(nx, d_mat, d_src, d_dest);
         std::swap(d_src, d_dest);
     }

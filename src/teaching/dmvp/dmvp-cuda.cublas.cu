@@ -15,7 +15,8 @@
 template <typename tpe>
 inline int realMain(int argc, char *argv[]) {
     char *tpeName;
-    size_t nx, nItWarmUp, nIt;
+    long long nx;
+    int nItWarmUp, nIt;;
     parseCLA_1d(argc, argv, tpeName, nx, nItWarmUp, nIt);
 
     double *mat, *src, *dest;
@@ -40,7 +41,7 @@ inline int realMain(int argc, char *argv[]) {
     CUBLAS_CHECK(cublasCreate_v2(&handle));
 
     // warm-up
-    for (size_t i = 0; i < nItWarmUp; ++i) {
+    for (int i = 0; i < nItWarmUp; ++i) {
         const auto alpha = 1.;
         const auto beta = 0.;
         CUBLAS_CHECK(cublasDgemv(handle, CUBLAS_OP_N, nx, nx, &alpha, d_mat, nx, d_src, 1, &beta, d_dest, 1));
@@ -51,7 +52,7 @@ inline int realMain(int argc, char *argv[]) {
     // measurement
     auto start = std::chrono::steady_clock::now();
 
-    for (size_t i = 0; i < nIt; ++i) {
+    for (int i = 0; i < nIt; ++i) {
         const auto alpha = 1.;
         const auto beta = 0.;
         CUBLAS_CHECK(cublasDgemv(handle, CUBLAS_OP_N, nx, nx, &alpha, d_mat, nx, d_src, 1, &beta, d_dest, 1));

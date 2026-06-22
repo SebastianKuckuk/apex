@@ -1,13 +1,19 @@
 #include "dmvp-util.h"
 
 
-template <typename tpe>
-inline void dmvp(long long nx, const tpe *const __restrict__ mat, const tpe *const __restrict__ src, tpe *__restrict__ dest) {
-    #pragma omp target teams distribute parallel for
-    for (int row = 0; row < nx; ++row) {
-        dest[row] = 0.;
+template <typename tpe, int blk = 4>
+inline void dmvp(long long nx, const tpe *const __restrict__ mat, const tpe *const __restrict__ src, tpe *const __restrict__ dest) {
+    #pragma omp target teams distribute
+    for (int row = 0; row < nx; row += blk) {
+        tpe acc[blk] = {};
+        #pragma omp parallel for reduction(+ : acc[:blk])
         for (int col = 0; col < nx; ++col)
-            dest[row] += mat[row * nx + col] * src[col];
+            for (int b = 0; b < blk; ++b)
+                if (row + b < nx)
+                    acc[b] += mat[(row + b) * nx + col] * src[col];
+        for (int b = 0; b < blk; ++b)
+            if (row + b < nx)
+                dest[row + b] = acc[b];
     }
 }
 

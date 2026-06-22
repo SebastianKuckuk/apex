@@ -3,20 +3,20 @@
 
 
 template <typename tpe>
-__global__ void dmvp(size_t nx, const tpe *const __restrict__ mat, const tpe *const __restrict__ src, tpe *__restrict__ dest) {
-    size_t r = blockIdx.x * blockDim.x + threadIdx.x;
-    size_t c = blockIdx.y * blockDim.y + threadIdx.y;
+__global__ void dmvp(long long nx, const tpe *const __restrict__ mat, const tpe *const __restrict__ src, tpe *__restrict__ dest) {
+    int row = blockIdx.x * blockDim.x + threadIdx.x;
+    int col = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if (r < nx && c < nx) {
-        atomicAdd(&dest[r], mat[r * nx + c] * src[c]);
-    }
+    if (row < nx && col < nx)
+        atomicAdd(&dest[row], mat[row * nx + col] * src[col]);
 }
 
 
 template <typename tpe>
 inline int realMain(int argc, char *argv[]) {
     char *tpeName;
-    size_t nx, nItWarmUp, nIt;
+    long long nx;
+    int nItWarmUp, nIt;;
     parseCLA_1d(argc, argv, tpeName, nx, nItWarmUp, nIt);
 
     double *mat, *src, *dest;
@@ -40,7 +40,7 @@ inline int realMain(int argc, char *argv[]) {
     dim3 numBlocks(ceilingDivide(nx, blockSize.x), ceilingDivide(nx, blockSize.y));
 
     // warm-up
-    for (size_t i = 0; i < nItWarmUp; ++i) {
+    for (int i = 0; i < nItWarmUp; ++i) {
         cudaMemset(d_dest, 0, sizeof(double) * nx);
         dmvp<<<numBlocks, blockSize>>>(nx, d_mat, d_src, d_dest);
         std::swap(d_src, d_dest);
@@ -50,7 +50,7 @@ inline int realMain(int argc, char *argv[]) {
     // measurement
     auto start = std::chrono::steady_clock::now();
 
-    for (size_t i = 0; i < nIt; ++i) {
+    for (int i = 0; i < nIt; ++i) {
         cudaMemset(d_dest, 0, sizeof(double) * nx);
         dmvp<<<numBlocks, blockSize>>>(nx, d_mat, d_src, d_dest);
         std::swap(d_src, d_dest);
